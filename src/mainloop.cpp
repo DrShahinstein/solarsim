@@ -80,13 +80,13 @@ void mainloop(GLFWwindow *window) {
 
   // full-screen quad for ray marching
   float quad_vertices[] = {
-    -1.0f,  1.0f, // top-left
-    -1.0f, -1.0f, // bottom-left
-    1.0f, -1.0f,  // bottom-right
-        
-    -1.0f,  1.0f, // top-left
-    1.0f, -1.0f,  // bottom-right
-    1.0f,  1.0f   // top-right
+      -1.0f, 1.0f,  // top-left
+      -1.0f, -1.0f, // bottom-left
+      1.0f,  -1.0f, // bottom-right
+
+      -1.0f, 1.0f,  // top-left
+      1.0f,  -1.0f, // bottom-right
+      1.0f,  1.0f   // top-right
   };
 
   unsigned int quad_VAO, quad_VBO;
@@ -150,54 +150,6 @@ void mainloop(GLFWwindow *window) {
     mouse_callback(window, xpos, ypos, yaw, pitch, camera_front);
   });
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-  // 3d grid
-  const int grid_size = 20;
-  const float grid_spacing = 0.5f;
-  std::vector<Vertex> grid_vertices;
-
-  for (int i = -grid_size; i <= grid_size; ++i) {
-    grid_vertices.push_back(
-        {{i * grid_spacing, 0.0f, -grid_size * grid_spacing},
-         {0.3f, 0.3f, 0.3f}});
-
-    grid_vertices.push_back({{i * grid_spacing, 0.0f, grid_size * grid_spacing},
-                             {0.3f, 0.3f, 0.3f}});
-
-    grid_vertices.push_back(
-        {{-grid_size * grid_spacing, 0.0f, i * grid_spacing},
-         {0.3f, 0.3f, 0.3f}});
-
-    grid_vertices.push_back({{grid_size * grid_spacing, 0.0f, i * grid_spacing},
-                             {0.3f, 0.3f, 0.3f}});
-  }
-
-  // VAO/VBO for grid
-  unsigned int grid_VAO, grid_VBO;
-  glGenVertexArrays(1, &grid_VAO);
-  glGenBuffers(1, &grid_VBO);
-
-  glBindVertexArray(grid_VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, grid_VBO);
-  glBufferData(GL_ARRAY_BUFFER, grid_vertices.size() * sizeof(Vertex), grid_vertices.data(), GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, color));
-  glEnableVertexAttribArray(1);
-
-  // VAO/VBO for planets
-  unsigned int bodies_VAO, bodies_VBO;
-  glGenVertexArrays(1, &bodies_VAO);
-  glGenBuffers(1, &bodies_VBO);
-
-  glBindVertexArray(bodies_VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, bodies_VBO);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, color));
-  glEnableVertexAttribArray(1);
 
   glEnable(GL_DEPTH_TEST);
 
