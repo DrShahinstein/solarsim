@@ -101,7 +101,7 @@ void mainloop(GLFWwindow *window) {
   glEnableVertexAttribArray(0);
 
   // camera setup
-  static glm::vec3 camera_pos(0.0f, 0.0f, 5.0f);
+  static glm::vec3 camera_pos(0.0f, 0.0f, 3.0f);
   static glm::vec3 camera_front(0.0f, 0.0f, -1.0f);
   static glm::vec3 camera_up(0.0f, 1.0f, 0.0f);
   static float yaw = -90.0f;
