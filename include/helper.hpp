@@ -1,0 +1,13 @@
+#ifndef HELPER_HPP
+#define HELPER_HPP
+
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void esc_quit(GLFWwindow *window);
+void camera_callback(GLFWwindow *window, int key, int scancode, int action, int mods, glm::vec3 &camera_pos, glm::vec3 &camera_front, glm::vec3 &camera_up);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos, float &yaw, float &pitch, glm::vec3 &camera_front);
+const char *load_shader(const char *shader_path);
+
+#endif
