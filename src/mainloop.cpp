@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <chrono>
 #include <thread>
 #include <iostream>
@@ -13,6 +14,12 @@
 struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
+};
+
+struct CalestialBodyData {
+  glm::vec3 position;
+  glm::vec3 color;
+  float radius;
 };
 
 void mainloop(GLFWwindow *window) {
@@ -70,6 +77,28 @@ void mainloop(GLFWwindow *window) {
   Simulation simulation;
   simulation.reset_to_solar_system();
   glfwSetWindowUserPointer(window, &simulation);
+
+  // full-screen quad for ray marching
+  float quad_vertices[] = {
+    -1.0f,  1.0f, // top-left
+    -1.0f, -1.0f, // bottom-left
+    1.0f, -1.0f,  // bottom-right
+        
+    -1.0f,  1.0f, // top-left
+    1.0f, -1.0f,  // bottom-right
+    1.0f,  1.0f   // top-right
+  };
+
+  unsigned int quad_VAO, quad_VBO;
+  glGenVertexArrays(1, &quad_VAO);
+  glGenBuffers(1, &quad_VBO);
+    
+  glBindVertexArray(quad_VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, quad_VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+    
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
 
   // camera setup
   static glm::vec3 camera_pos(0.0f, 0.0f, 5.0f);
@@ -188,31 +217,35 @@ void mainloop(GLFWwindow *window) {
     simulation.update(1.0 / (float)FPS);
     const auto &bodies = simulation.get_bodies();
 
-    std::vector<Vertex> body_vertices;
-    for (const auto &body : bodies) {
-      body_vertices.push_back({glm::vec3(body.position), body.color});
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, bodies_VBO);
-    glBufferData(GL_ARRAY_BUFFER, body_vertices.size() * sizeof(Vertex), body_vertices.data(), GL_DYNAMIC_DRAW);
-
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-    glm::mat4 view =
-        glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
+    // calculate camera vectors
+    glm::vec3 camera_target = camera_pos + camera_front;
+    glm::vec3 camera_right  = glm::normalize(glm::cross(camera_front, camera_up));
+    glm::vec3 camera_up_vec = glm::cross(camera_right, camera_front);
+    float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
     glUseProgram(shader_program);
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "projection"), 1, GL_FALSE, &projection[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "view"), 1, GL_FALSE, &view[0][0]);
-    glm::mat4 model = glm::mat4(1.0f);
-    glUniformMatrix4fv(glGetUniformLocation(shader_program, "model"), 1, GL_FALSE, &model[0][0]);
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_pos"), 1, glm::value_ptr(camera_pos));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_front"), 1, glm::value_ptr(camera_front));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_up"), 1, glm::value_ptr(camera_up_vec));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(camera_right));
+    glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
+    glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
 
-    glBindVertexArray(grid_VAO);
-    glDrawArrays(GL_LINES, 0, grid_vertices.size());
+    for (size_t i = 0; i < bodies.size(); i++) {
+      std::string index = "bodies[" + std::to_string(i) + "]";
+      CalestialBodyData body_data = {
+        glm::vec3(bodies[i].position),
+        bodies[i].color,
+        static_cast<float>(bodies[i].radius)
+      };
 
-    glPointSize(8.0f);
-    glBindVertexArray(bodies_VAO);
-    glDrawArrays(GL_POINTS, 0, body_vertices.size());
+      glUniform3fv(glGetUniformLocation(shader_program, (index + ".position").c_str()), 1, glm::value_ptr(body_data.position));
+      glUniform1f(glGetUniformLocation(shader_program, (index + ".radius").c_str()), body_data.radius);
+      glUniform3fv(glGetUniformLocation(shader_program, (index + ".color").c_str()), 1, glm::value_ptr(body_data.color));
+    }
+
+    glBindVertexArray(quad_VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -222,9 +255,7 @@ void mainloop(GLFWwindow *window) {
   }
 
   // cleanup
-  glDeleteVertexArrays(1, &grid_VAO);
-  glDeleteBuffers(1, &grid_VBO);
-  glDeleteVertexArrays(1, &bodies_VAO);
-  glDeleteBuffers(1, &bodies_VBO);
+  glDeleteVertexArrays(1, &quad_VAO);
+  glDeleteBuffers(1, &quad_VBO);
   glDeleteProgram(shader_program);
 }
