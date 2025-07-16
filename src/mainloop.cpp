@@ -3,12 +3,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include "mainloop.hpp"
 #include "helper.hpp"
 #include "simulation.hpp"
+#include "gui.hpp"
 #include "window.h"
 
 struct Vertex {
@@ -71,12 +75,7 @@ void mainloop(GLFWwindow *window) {
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
   delete[] vertex_shader_src;
-  delete[] fragment_shader_src;
-
-  // init simulation
-  Simulation simulation;
-  simulation.reset_to_solar_system();
-  glfwSetWindowUserPointer(window, &simulation);
+  delete[] fragment_shader_src; // shaders end
 
   // full-screen quad for ray marching
   float quad_vertices[] = {
@@ -100,28 +99,53 @@ void mainloop(GLFWwindow *window) {
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
+  // prepare app
+  initialize_imgui(window);
+  Simulation simulation;
+  simulation.reset_to_solar_system();
+  AppState app {
+    .simulation = simulation,
+    .is_mouse_captured = true,
+    .is_paused = false,
+    .gui_visible = false,
+    .simulation_speed = 1.0f
+  };
+  glfwSetCursorPos(window, SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+  glfwSetWindowUserPointer(window, &app);
+
   // camera setup
   static glm::vec3 camera_pos(0.0f, 0.0f, 3.0f);
   static glm::vec3 camera_front(0.0f, 0.0f, -1.0f);
   static glm::vec3 camera_up(0.0f, 1.0f, 0.0f);
   static float yaw = -90.0f;
   static float pitch = 0.0f;
+  static bool reset_mouse_position = true;
 
   glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-    camera_callback(window, key, scancode, action, mods, camera_pos, camera_front, camera_up);
+    AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
 
-    if (action == GLFW_PRESS) {
-      Simulation* simulation = static_cast<Simulation*>(glfwGetWindowUserPointer(window));
-      if (!simulation) return;
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      if (app->is_mouse_captured) {
+        glfwGetCursorPos(window, &app->mouse_x, &app->mouse_y);
+        app->is_mouse_captured = false;
+        app->gui_visible = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPos(window, app->mouse_x, app->mouse_y);
+      } else {
+        app->is_mouse_captured = true;
+        app->gui_visible = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPos(window, SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+        reset_mouse_position = true;
+      }
+    }
 
+    if (app->is_mouse_captured) camera_callback(window, key, scancode, action, mods, camera_pos, camera_front, camera_up);
+    if (action == GLFW_PRESS && app->is_mouse_captured) {
       switch (key)
       {
-      case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, true);
-        break;
-
       case GLFW_KEY_R:
-        simulation->reset_to_solar_system();
+        app->simulation.reset_to_solar_system();
         break;
 
       case GLFW_KEY_B: {
@@ -132,12 +156,12 @@ void mainloop(GLFWwindow *window) {
         black_hole.radius = 0.05;
         black_hole.color = glm::vec3(0.0, 1.0, 0.0);
         black_hole.is_black_hole = true;
-        simulation->add_body(black_hole);
+        app->simulation.add_body(black_hole);
         break;
       }
 
       case GLFW_KEY_UP:
-        for (auto &body : simulation->get_bodies()) {
+        for (auto &body : app->simulation.get_bodies()) {
           if (!body.is_black_hole) {
             body.radius *= 1.2;
           }
@@ -145,7 +169,7 @@ void mainloop(GLFWwindow *window) {
         break;
 
       case GLFW_KEY_DOWN:
-        for (auto &body : simulation->get_bodies()) {
+        for (auto &body : app->simulation.get_bodies()) {
           if (!body.is_black_hole) {
             body.radius *= 0.8;
           }
@@ -156,14 +180,18 @@ void mainloop(GLFWwindow *window) {
         break;
       }
     }
-  });
+    });
 
   // setup mouse
   glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos) {
-    mouse_callback(window, xpos, ypos, yaw, pitch, camera_front);
+    AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
+    
+    if (app->is_mouse_captured) {
+      mouse_callback(window, xpos, ypos, yaw, pitch, camera_front, reset_mouse_position);
+    }
   });
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glEnable(GL_DEPTH_TEST);
 
   // frame limiter
@@ -174,11 +202,18 @@ void mainloop(GLFWwindow *window) {
   while (!glfwWindowShouldClose(window)) {
     auto frame_start = std::chrono::steady_clock::now();
 
+    AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    if (!app->is_paused) app->simulation.update(1.0 / (float)FPS * app->simulation_speed);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    simulation.update(1.0 / (float)FPS);
-    const auto &bodies = simulation.get_bodies();
+    const auto &bodies = app->simulation.get_bodies();
 
     // calculate camera vectors
     glm::vec3 camera_target = camera_pos + camera_front;
@@ -210,6 +245,13 @@ void mainloop(GLFWwindow *window) {
     glBindVertexArray(quad_VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    if (app->gui_visible) {
+      render_gui(*app);
+    } else {
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
     glfwSwapBuffers(window);
     glfwPollEvents();
 
@@ -218,6 +260,9 @@ void mainloop(GLFWwindow *window) {
   }
 
   // cleanup
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
   glDeleteVertexArrays(1, &quad_VAO);
   glDeleteBuffers(1, &quad_VBO);
   glDeleteProgram(shader_program);
