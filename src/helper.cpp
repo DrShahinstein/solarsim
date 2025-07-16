@@ -52,35 +52,35 @@ void camera_callback(GLFWwindow *window, int key, int scancode, int action, int 
   }
 }
 
-// Add mouse callback
-void mouse_callback(GLFWwindow *window, double xpos, double ypos, float &yaw, float &pitch, glm::vec3 &camera_front) {
-  static float lastX = SCREEN_WIDTH / 2.0f;
-  static float lastY = SCREEN_HEIGHT / 2.0f;
-  static bool first_mouse = true;
+void mouse_callback(GLFWwindow *window, double xpos, double ypos, float &yaw, float &pitch, glm::vec3 &camera_front, bool &reset_mouse_position) {
+  static double lastX = SCREEN_WIDTH / 2.0;
+  static double lastY = SCREEN_HEIGHT / 2.0;
 
-  if (first_mouse) {
+  if (reset_mouse_position) {
     lastX = xpos;
     lastY = ypos;
-    first_mouse = false;
+    reset_mouse_position = false;
+    return;
   }
 
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos;
+  double xoffset = xpos - lastX;
+  double yoffset = lastY - ypos;
   lastX = xpos;
   lastY = ypos;
 
   const float sensitivity = 0.1f;
   xoffset *= sensitivity;
   yoffset *= sensitivity;
-  yaw += xoffset;
+
+  yaw   += xoffset;
   pitch += yoffset;
 
   if (pitch > 89.0f)  pitch = 89.0f;
   if (pitch < -89.0f) pitch = -89.0f;
 
   glm::vec3 front;
-  front.x      = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  front.y      = sin(glm::radians(pitch));
-  front.z      = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+  front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+  front.y = sin(glm::radians(pitch));
+  front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
   camera_front = glm::normalize(front);
 }
