@@ -111,38 +111,51 @@ void mainloop(GLFWwindow *window) {
     camera_callback(window, key, scancode, action, mods, camera_pos, camera_front, camera_up);
 
     if (action == GLFW_PRESS) {
-        Simulation* simulation = static_cast<Simulation*>(glfwGetWindowUserPointer(window));
-        if (!simulation) return;
-        
-        if (key == GLFW_KEY_R) simulation->reset_to_solar_system();
-        else if (key == GLFW_KEY_B) {
-            CelestialBody black_hole;
-            black_hole.position = glm::dvec3(camera_pos);
-            black_hole.velocity = glm::dvec3(0.0);
-            black_hole.mass = 10.0; // 10 solar masses
-            black_hole.radius = 0.05;
-            black_hole.color = glm::vec3(0.0, 1.0, 0.0);
-            black_hole.is_black_hole = true;
-            simulation->add_body(black_hole);
-        }
+      Simulation* simulation = static_cast<Simulation*>(glfwGetWindowUserPointer(window));
+      if (!simulation) return;
 
-        else if (key == GLFW_KEY_UP) {
-            // increase planet sizes
-            for (auto& body : simulation->get_bodies()) {
-                if (!body.is_black_hole) {
-                    body.radius *= 1.2;
-                }
-            }
-        }
+      switch (key)
+      {
+      case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, true);
+        break;
 
-        else if (key == GLFW_KEY_DOWN) {
-            // decrease planet sizes
-            for (auto& body : simulation->get_bodies()) {
-                if (!body.is_black_hole) {
-                    body.radius *= 0.8;
-                }
-            }
-        }}
+      case GLFW_KEY_R:
+        simulation->reset_to_solar_system();
+        break;
+
+      case GLFW_KEY_B: {
+        CelestialBody black_hole;
+        black_hole.position = glm::dvec3(camera_pos);
+        black_hole.velocity = glm::dvec3(0.0);
+        black_hole.mass = 10.0;
+        black_hole.radius = 0.05;
+        black_hole.color = glm::vec3(0.0, 1.0, 0.0);
+        black_hole.is_black_hole = true;
+        simulation->add_body(black_hole);
+        break;
+      }
+
+      case GLFW_KEY_UP:
+        for (auto &body : simulation->get_bodies()) {
+          if (!body.is_black_hole) {
+            body.radius *= 1.2;
+          }
+        }
+        break;
+
+      case GLFW_KEY_DOWN:
+        for (auto &body : simulation->get_bodies()) {
+          if (!body.is_black_hole) {
+            body.radius *= 0.8;
+          }
+        }
+        break;
+
+      default:
+        break;
+      }
+    }
   });
 
   // setup mouse
@@ -160,8 +173,6 @@ void mainloop(GLFWwindow *window) {
   // loop
   while (!glfwWindowShouldClose(window)) {
     auto frame_start = std::chrono::steady_clock::now();
-
-    esc_quit(window);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
