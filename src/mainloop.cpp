@@ -9,6 +9,7 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <chrono>
 #include "mainloop.hpp"
 #include "helper.hpp"
 #include "simulation.hpp"
@@ -161,6 +162,11 @@ void mainloop(GLFWwindow *window) {
   double current_time = glfwGetTime();
   double accumulator = 0.0;
 
+  // frame limiting
+  using Clock = std::chrono::high_resolution_clock;
+  constexpr double TARGET_FRAME_TIME = 1.0 / 60.0; // 60 FPS
+  auto frame_start = Clock::now();
+
   // loop
   while (!glfwWindowShouldClose(window)) {
     double new_time = glfwGetTime();
@@ -229,6 +235,21 @@ void mainloop(GLFWwindow *window) {
     }
 
     glfwSwapBuffers(window);
+
+    auto frame_end = Clock::now();
+    auto elapsed_time = std::chrono::duration<double>(frame_end - frame_start).count();
+    double sleep_duration = TARGET_FRAME_TIME - elapsed_time;
+
+    if (sleep_duration > 0) {
+      std::this_thread::sleep_for(std::chrono::duration<double>(sleep_duration * 0.9));
+
+      auto spin_start = Clock::now();
+      do {
+        std::this_thread::yield();
+      } while (std::chrono::duration<double>(Clock::now() - spin_start).count() < sleep_duration * 0.1);
+    }
+
+    frame_start = Clock::now();
   }
 
   // cleanup
