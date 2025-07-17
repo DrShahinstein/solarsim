@@ -7,66 +7,63 @@
 
 enum class CameraMovement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
-// default cam values
-const float YAW = -90.0f;
-const float PITCH = 0.0f;
-const float SPEED = 2.5f;
-const float SENSITIVITY = 0.1f;
+const float YAW_DEFAULT = -90.0f;
+const float PITCH_DEFAULT = 0.0f;
+const float SPEED_DEFAULT = 2.5f;
+const float SENSITIVITY_DEFAULT = 0.1f;
 
 class Camera {
 public:
   // attributes
-  glm::vec3 position;
-  glm::vec3 front;
-  glm::vec3 up;
-  glm::vec3 right;
-  glm::vec3 worldup;
+  glm::vec3 m_position;
+  glm::vec3 m_front;
+  glm::vec3 m_up;
+  glm::vec3 m_right;
+  glm::vec3 m_worldup;
   // euler angles
-  float yaw;
-  float pitch;
+  float m_yaw;
+  float m_pitch;
   // options
-  float movement_speed;
-  float mouse_sensitivity;
+  float m_movement_speed;
+  float m_mouse_sensitivity;
 
-  Camera(glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 3.0f),
-         glm::vec3 up_ = glm::vec3(0.0f, 1.0f, 0.0f), float yaw_ = YAW,
-         float pitch_ = PITCH)
-      : front(glm::vec3(0.0f, 0.0f, -1.0f)), movement_speed(SPEED),
-        mouse_sensitivity(SENSITIVITY) {
-    position = position_;
-    worldup = up_;
-    yaw = yaw_;
-    pitch = pitch_;
+  Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f),
+         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW_DEFAULT,
+         float pitch = PITCH_DEFAULT)
+      : m_front(glm::vec3(0.0f, 0.0f, -1.0f)), m_movement_speed(SPEED_DEFAULT),
+        m_mouse_sensitivity(SENSITIVITY_DEFAULT) {
+    m_position = position;
+    m_worldup = up;
+    m_yaw = yaw;
+    m_pitch = pitch;
     update_camera_vectors();
   }
 
   void process_keyboard(CameraMovement direction, float delta_time) {
-    float velocity = movement_speed * delta_time;
+    float velocity = m_movement_speed * delta_time;
     if (direction == CameraMovement::FORWARD)
-      position += front * velocity;
+      m_position += m_front * velocity;
     if (direction == CameraMovement::BACKWARD)
-      position -= front * velocity;
+      m_position -= m_front * velocity;
     if (direction == CameraMovement::LEFT)
-      position -= right * velocity;
+      m_position -= m_right * velocity;
     if (direction == CameraMovement::RIGHT)
-      position += right * velocity;
+      m_position += m_right * velocity;
     if (direction == CameraMovement::UP)
-      position += worldup * velocity;
+      m_position += m_worldup * velocity;
     if (direction == CameraMovement::DOWN)
-      position -= worldup * velocity;
+      m_position -= m_worldup * velocity;
   }
 
   void process_mouse_movement(float xoffset, float yoffset, bool constrain_pitch = true) {
-    xoffset *= mouse_sensitivity;
-    yoffset *= mouse_sensitivity;
-    yaw += xoffset;
-    pitch += yoffset;
+    xoffset *= m_mouse_sensitivity;
+    yoffset *= m_mouse_sensitivity;
+    m_yaw += xoffset;
+    m_pitch += yoffset;
 
     if (constrain_pitch) {
-      if (pitch > 89.0f)
-        pitch = 89.0f;
-      if (pitch < -89.0f)
-        pitch = -89.0f;
+      if (m_pitch > 89.0f)  m_pitch = 89.0f;
+      if (m_pitch < -89.0f) m_pitch = -89.0f;
     }
 
     update_camera_vectors();
@@ -74,13 +71,13 @@ public:
 
 private:
   void update_camera_vectors() {
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front = glm::normalize(front);
-    right = glm::normalize(glm::cross(front, worldup));
-    up = glm::normalize(glm::cross(right, front));
+    glm::vec3 front_vec;
+    front_vec.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    front_vec.y = sin(glm::radians(m_pitch));
+    front_vec.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    m_front = glm::normalize(front_vec);
+    m_right = glm::normalize(glm::cross(m_front, m_worldup));
+    m_up = glm::normalize(glm::cross(m_right, m_front));
   }
 };
 
