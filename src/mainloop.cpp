@@ -216,7 +216,6 @@ void mainloop(GLFWwindow *window) {
     const auto &bodies = app->simulation.get_bodies();
 
     // calculate camera vectors
-    glm::vec3 camera_target = camera_pos + camera_front;
     glm::vec3 camera_right  = glm::normalize(glm::cross(camera_front, camera_up));
     glm::vec3 camera_up_vec = glm::cross(camera_right, camera_front);
     float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
