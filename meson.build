@@ -1,6 +1,6 @@
 project('solarsim', ['cpp', 'c'],
   version : '0.1.0',
-  default_options : ['cpp_std=c++17'])
+  default_options : ['cpp_std=c++20', 'c_std=c17'])
 
 is_windows = host_machine.system() == 'windows' or \
              host_machine.system() == 'msys' or \
