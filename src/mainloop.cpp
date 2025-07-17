@@ -28,10 +28,12 @@ struct CalestialBodyData {
 
 void mainloop(GLFWwindow *window) {
   // shader arrangements
-  const char *vertex_shader_src   = load_shader("shaders/vertex_shader.glsl");
-  const char *fragment_shader_src = load_shader("shaders/fragment_shader.glsl");
+  std::string vertex_shader_str   = load_shader("shaders/vertex_shader.glsl");
+  std::string fragment_shader_str = load_shader("shaders/fragment_shader.glsl");
+  const char *vertex_shader_src   = vertex_shader_str.c_str();
+  const char *fragment_shader_src = fragment_shader_str.c_str();
 
-  if (!vertex_shader_src || !fragment_shader_src) {
+  if (vertex_shader_str.empty() || fragment_shader_str.empty()) {
     std::cerr << "Shaders could not be loaded\n";
     return;
   }
@@ -73,9 +75,7 @@ void mainloop(GLFWwindow *window) {
   }
 
   glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-  delete[] vertex_shader_src;
-  delete[] fragment_shader_src; // shaders end
+  glDeleteShader(fragment_shader); // shaders end
 
   // full-screen quad for ray marching
   float quad_vertices[] = {
