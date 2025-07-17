@@ -1,17 +1,25 @@
 project('solarsim', ['cpp', 'c'],
   version : '0.1.0',
-  default_options : ['cpp_std=c++20', 'c_std=c17'])
+  default_options : [
+    'cpp_std=c++20',
+    'c_std=c17',
+    'buildtype=release',
+    'default_library=static'
+  ])
 
-is_windows = host_machine.system() == 'windows' or \
-             host_machine.system() == 'msys' or \
-             host_machine.system() == 'cygwin'
+system = host_machine.system()
+is_windows = system == 'windows' or system == 'msys' or system == 'cygwin'
+is_linux = system == 'linux'
+is_darwin = system == 'darwin'
 
 if is_windows
   opengl_dep = declare_dependency(link_args : ['-lopengl32'])
-  message('Detected Windows, linking with opengl32.lib')
+elif is_darwin
+  app_frameworks = ['-framework', 'OpenGL', '-framework', 'Cocoa', 
+                    '-framework', 'IOKit', '-framework', 'CoreVideo']
+  opengl_dep = declare_dependency(link_args : app_frameworks)
 else
-  opengl_dep = dependency('opengl', required : true)
-  message('Non-Windows platform, using standard OpenGL dependency')
+  opengl_dep = dependency('gl', required : true)
 endif
 
 if is_windows
@@ -22,10 +30,31 @@ if is_windows
     link_args           : [glfw_lib],
     dependencies        : [opengl_dep]
   )
-
+elif is_darwin
+  glfw_dep = dependency('glfw3', required : false)
+  if not glfw_dep.found()
+    glfw_path = '/opt/homebrew/lib'  # For ARM Macs
+    if not run_command('test', '-d', glfw_path, check: false).returncode() == 0
+      glfw_path = '/usr/local/lib'   # For Intel Macs
+    endif
+    glfw_dep = declare_dependency(
+      link_args : ['-L' + glfw_path, '-lglfw'],
+      dependencies : [opengl_dep]
+    )
+  endif
 else
   glfw_dep = dependency('glfw3', required : true)
-  message('Using system-installed GLFW')
+endif
+
+linux_deps = []
+if is_linux
+  linux_deps = [
+    dependency('x11'),
+    dependency('xi'),
+    dependency('xrandr'),
+    dependency('xinerama'),
+    dependency('xcursor')
+  ]
 endif
 
 inc = include_directories(
@@ -35,7 +64,7 @@ inc = include_directories(
   'imgui/backends',
 )
 
-glm_inc = include_directories('glm')
+glm_inc = include_directories('glm', is_system: true)
 
 app_sources = files(
   'src/main.cpp',
@@ -56,25 +85,27 @@ imgui_sources = files(
   'imgui/backends/imgui_impl_opengl3.cpp',
 )
 
-program_install_subdir = 'app'
+program_install_subdir = is_windows ? 'app' : get_option('bindir')
 
 executable('solarsim',
   app_sources,
   glad_sources,
   imgui_sources,
   include_directories : [inc, glm_inc],
-  dependencies        : [opengl_dep, glfw_dep],
-  link_args           : ['-mwindows'],
+  dependencies        : [opengl_dep, glfw_dep] + linux_deps,
+  link_args           : is_windows ? ['-mwindows'] : [],
   install             : true,
   install_dir         : program_install_subdir
 )
 
 if is_windows
-  install_data(meson.current_source_dir() / 'glfw' / 'lib-mingw' / 'glfw3.dll',
+  install_data(
+    meson.current_source_dir() / 'glfw' / 'lib-mingw' / 'glfw3.dll',
     install_dir : program_install_subdir
   )
 endif
 
-install_subdir('shaders',
-  install_dir : program_install_subdir
+install_subdir(
+  'shaders',
+  install_dir : program_install_subdir,
 )
