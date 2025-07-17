@@ -3,15 +3,18 @@
 
 #include <GLFW/glfw3.h>
 #include "simulation.hpp"
+#include "camera.hpp"
 
 struct AppState{
   Simulation simulation;
+  Camera *camera;
   bool is_mouse_captured;
   bool is_paused;
   bool gui_visible;
   float simulation_speed = 1.0f;
-  double mouse_x = 0.0;
-  double mouse_y = 0.0;
+  double lastX;
+  double lastY;
+  bool first_mouse;
 };
 
 void mainloop(GLFWwindow *window);
