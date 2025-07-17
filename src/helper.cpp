@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include "helper.hpp"
 #include "window.h"
 
@@ -12,22 +13,15 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-const char *load_shader(const char *shader_path) {
+std::string load_shader(const char *shader_path) {
   std::ifstream shader_file(shader_path);
-
   if (!shader_file) {
     std::cerr << "Could not open shader file: " << shader_path << std::endl;
-    return nullptr;
+    return "";
   }
-
   std::stringstream shader_stream;
   shader_stream << shader_file.rdbuf();
-
-  std::string shader_code = shader_stream.str();
-  char *shader_code_cstr = new char[shader_code.size() + 1];
-
-  std::strcpy(shader_code_cstr, shader_code.c_str());
-  return shader_code_cstr;
+  return shader_stream.str();
 }
 
 void camera_callback(GLFWwindow *window, int key, int scancode, int action, int mods, glm::vec3 &camera_pos, glm::vec3 &camera_front, glm::vec3 &camera_up) {
