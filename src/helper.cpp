@@ -8,6 +8,8 @@
 #include <string>
 #include "helper.hpp"
 #include "window.h"
+#include "camera.hpp"
+#include "mainloop.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -24,57 +26,17 @@ std::string load_shader(const char *shader_path) {
   return shader_stream.str();
 }
 
-void camera_callback(GLFWwindow *window, int key, int scancode, int action, int mods, glm::vec3 &camera_pos, glm::vec3 &camera_front, glm::vec3 &camera_up) {
-  static float speed = 0.1f;
-
-  if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-    glm::vec3 camera_right =
-        glm::normalize(glm::cross(camera_front, camera_up));
-
-    if (key == GLFW_KEY_W)
-      camera_pos += speed * camera_front;
-    if (key == GLFW_KEY_S)
-      camera_pos -= speed * camera_front;
-    if (key == GLFW_KEY_A)
-      camera_pos -= speed * camera_right;
-    if (key == GLFW_KEY_D)
-      camera_pos += speed * camera_right;
-    if (key == GLFW_KEY_SPACE)
-      camera_pos += speed * camera_up;
-    if (key == GLFW_KEY_LEFT_SHIFT)
-      camera_pos -= speed * camera_up;
-  }
-}
-
-void mouse_callback(GLFWwindow *window, double xpos, double ypos, float &yaw, float &pitch, glm::vec3 &camera_front, bool &reset_mouse_position) {
-  static double lastX = SCREEN_WIDTH / 2.0;
-  static double lastY = SCREEN_HEIGHT / 2.0;
-
-  if (reset_mouse_position) {
-    lastX = xpos;
-    lastY = ypos;
-    reset_mouse_position = false;
-    return;
-  }
-
-  double xoffset = xpos - lastX;
-  double yoffset = lastY - ypos;
-  lastX = xpos;
-  lastY = ypos;
-
-  const float sensitivity = 0.1f;
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
-
-  yaw   += xoffset;
-  pitch += yoffset;
-
-  if (pitch > 89.0f)  pitch = 89.0f;
-  if (pitch < -89.0f) pitch = -89.0f;
-
-  glm::vec3 front;
-  front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-  front.y = sin(glm::radians(pitch));
-  front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-  camera_front = glm::normalize(front);
+void process_input(GLFWwindow *window, Camera &camera, float delta_time, AppState *app) {
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::FORWARD, delta_time);
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::BACKWARD, delta_time);
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::LEFT, delta_time);
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::RIGHT, delta_time);
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::UP, delta_time);
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    camera.process_keyboard(CameraMovement::DOWN, delta_time);
 }
