@@ -123,7 +123,7 @@ void mainloop(GLFWwindow *window) {
         break;
       case GLFW_KEY_B: {
         CelestialBody black_hole;
-        black_hole.position      = glm::dvec3(app->camera->position + app->camera->front * 1.0f);
+        black_hole.position      = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
         black_hole.velocity      = glm::dvec3(0.0);
         black_hole.mass          = 100.0;
         black_hole.radius        = 0.2;
@@ -201,10 +201,10 @@ void mainloop(GLFWwindow *window) {
     float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
     glUseProgram(shader_program);
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_pos"), 1, glm::value_ptr(app_ptr->camera->position));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_front"), 1, glm::value_ptr(app_ptr->camera->front));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_up"), 1, glm::value_ptr(app_ptr->camera->up));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(app_ptr->camera->right));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_pos"), 1, glm::value_ptr(app_ptr->camera->m_position));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_front"), 1, glm::value_ptr(app_ptr->camera->m_front));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_up"), 1, glm::value_ptr(app_ptr->camera->m_up));
+    glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(app_ptr->camera->m_right));
     glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
     glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
 
