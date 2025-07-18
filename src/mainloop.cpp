@@ -9,7 +9,6 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-#include <chrono>
 #include "mainloop.hpp"
 #include "callbacks.hpp"
 #include "shaders.hpp"
