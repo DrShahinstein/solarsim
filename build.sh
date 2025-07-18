@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ "$1" == "--run" ]]; then
-    ./build/app/solarsim
+    ./build/dist/solarsim
 else
     meson setup build --prefix ${PWD}/build
     meson compile -C build
