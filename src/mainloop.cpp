@@ -11,7 +11,8 @@
 #include <iostream>
 #include <chrono>
 #include "mainloop.hpp"
-#include "helper.hpp"
+#include "callbacks.hpp"
+#include "shaders.hpp"
 #include "simulation.hpp"
 #include "gui.hpp"
 #include "window.h"
@@ -29,47 +30,8 @@ struct CalestialBodyData {
 };
 
 void mainloop(GLFWwindow *window) {
-  std::string vertex_shader_str   = load_shader("shaders/vertex_shader.glsl");
-  std::string fragment_shader_str = load_shader("shaders/fragment_shader.glsl");
-  const char *vertex_shader_src   = vertex_shader_str.c_str();
-  const char *fragment_shader_src = fragment_shader_str.c_str();
-
-  if (vertex_shader_str.empty() || fragment_shader_str.empty()) {
-    std::cerr << "Shaders could not be loaded\n";
-    return;
-  }
-
-  unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_shader_src, NULL);
-  glCompileShader(vertex_shader);
-  int success;
-  char info_log[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log << std::endl;
-  }
-
-  unsigned int fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_src, NULL);
-  glCompileShader(fragment_shader);
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log << std::endl;
-  }
-
-  unsigned int shader_program = glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-  glLinkProgram(shader_program);
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << info_log << std::endl;
-  }
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
+  // shaders
+  auto shader_program = create_shader_program();
 
   // fs quad setup
   float quad_vertices[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
