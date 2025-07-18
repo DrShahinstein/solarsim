@@ -1,24 +1,22 @@
+#include "simulation.hpp"
 #include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
-#include "simulation.hpp"
 
-// gravitational constant in AU^3 / (M_sun * day^2)
 constexpr double DEFAULT_G = 0.000295912208;
 
-Simulation::Simulation() : G(DEFAULT_G) {}
+Simulation::Simulation() : G(DEFAULT_G)              { current_integrator = &Simulation::integrate_velocity_verlet; }
 void Simulation::add_body(const CelestialBody &body) { bodies.push_back(body); }
-void Simulation::clear_bodies() { bodies.clear(); }
-void Simulation::setG(double value) { G = value; }
+void Simulation::clear_bodies()                      { bodies.clear(); }
+void Simulation::setG(double value)                  { G = value; }
 std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
 
 void Simulation::compute_forces() {
-  // reset accelerations
   for (auto &body : bodies) {
+    body.previous_acceleration = body.acceleration;
     body.acceleration = glm::dvec3(0.0);
   }
 
-  // compute gravitational forces
   for (size_t i = 0; i < bodies.size(); ++i) {
     for (size_t j = i + 1; j < bodies.size(); ++j) {
       auto &body1 = bodies[i];
@@ -26,11 +24,8 @@ void Simulation::compute_forces() {
 
       glm::dvec3 r = body2.position - body1.position;
       double distance_sq = glm::length2(r);
-      double distance = std::sqrt(distance_sq);
 
-      // avoid division by zero
-      if (distance < 1e-10)
-        continue;
+      if (distance_sq < 1e-12) continue;
 
       double force_magnitude = G * body1.mass * body2.mass / distance_sq;
       glm::dvec3 force_dir = glm::normalize(r);
@@ -42,28 +37,33 @@ void Simulation::compute_forces() {
   }
 }
 
-// simplified GR corrections for black holes
 void Simulation::apply_post_newtonian_corrections() {
-  const double C = 63241.1; // speed of light in AU/day
+  const double C = 173.1446;
+  const double C_SQ = C * C;
 
+  std::vector<CelestialBody *> blackholes;
   for (auto &body : bodies) {
-    if (!body.is_black_hole)
-      continue;
+    if (body.is_black_hole) {
+      blackholes.push_back(&body);
+    }
+  }
+
+  for (auto *bh : blackholes) {
+    const double rs = (2.0 * G * bh->mass) / C_SQ;
 
     for (auto &other : bodies) {
-      if (&body == &other)
-        continue;
+      if (&other == bh || other.is_black_hole) continue;
 
-      glm::dvec3 r = other.position - body.position;
+      glm::dvec3 r = other.position - bh->position;
       double distance = glm::length(r);
-      if (distance < 1e-10)
-        continue;
+
+      if (distance < 100.0 * rs) continue;
+      if (distance < 1e-10)      continue;
 
       glm::dvec3 direction = glm::normalize(r);
       double v_sq = glm::length2(other.velocity);
 
-      // post-newtonian correction (simplified)
-      double correction = (3.0 * G * body.mass) / (C * C * distance);
+      double correction = (3.0 * G * bh->mass) / (C_SQ * distance);
       glm::dvec3 extra_accel = correction * v_sq * direction;
 
       other.acceleration += extra_accel;
@@ -71,13 +71,18 @@ void Simulation::apply_post_newtonian_corrections() {
   }
 }
 
-void Simulation::update(double dt) {
+void Simulation::update(double dt) { (this->*current_integrator)(dt); }
+
+void Simulation::integrate_velocity_verlet(double dt) {
+  for (auto &body : bodies) {
+    body.position += body.velocity * dt + 0.5 * body.acceleration * (dt * dt);
+  }
+
   compute_forces();
   apply_post_newtonian_corrections();
 
   for (auto &body : bodies) {
-    body.velocity += body.acceleration * dt;
-    body.position += body.velocity * dt;
+    body.velocity += 0.5 * (body.previous_acceleration + body.acceleration) * dt;
   }
 }
 
@@ -90,7 +95,7 @@ void Simulation::reset_to_solar_system() {
       glm::dvec3(0.0),           // velocity
       glm::dvec3(0.0),           // acceleration
       1.0,                       // mass (solar masses)
-      0.1,                       // radius
+      0.2,                       // radius
       glm::vec3(1.0, 1.0, 0.0)   // yellow
   });
 
