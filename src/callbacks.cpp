@@ -1,13 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
 #include "callbacks.hpp"
-#include "window.h"
 #include "camera.hpp"
 #include "mainloop.hpp"
 
