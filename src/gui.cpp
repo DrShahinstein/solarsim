@@ -19,7 +19,7 @@ void initialize_imgui(GLFWwindow *window) {
 void render_gui(AppState &app) {
   ImGui::Begin("Simulation Controls");
   ImGui::Checkbox("Pause Simulation", &app.is_paused);
-  ImGui::SliderFloat("Simulation Speed", &app.simulation_speed, 0.1f, 10.0f);
+  ImGui::SliderFloat("Simulation Speed", &app.simulation_speed, 1.0f, 1000.0f);
   ImGui::End();
 
   ImGui::Render();
