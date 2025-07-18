@@ -102,6 +102,12 @@ void mainloop(GLFWwindow *window) {
   // input callbacks
   glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
     AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
+    ImGuiIO &io = ImGui::GetIO();
+
+    if (io.WantCaptureKeyboard) {
+      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+      return;
+    }
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
       if (app->is_mouse_captured) {
@@ -109,6 +115,7 @@ void mainloop(GLFWwindow *window) {
         app->is_mouse_captured = false;
         app->gui_visible = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        ImGui::GetIO().MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
       } else {
         app->is_mouse_captured = true;
         app->gui_visible = false;
@@ -124,11 +131,11 @@ void mainloop(GLFWwindow *window) {
         break;
       case GLFW_KEY_B: {
         CelestialBody black_hole;
-        black_hole.position      = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
-        black_hole.velocity      = glm::dvec3(0.0);
-        black_hole.mass          = 100.0;
-        black_hole.radius        = 0.2;
-        black_hole.color         = glm::vec3(0.0, 1.0, 0.0);
+        black_hole.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
+        black_hole.velocity = glm::dvec3(0.0);
+        black_hole.mass = 100.0;
+        black_hole.radius = 0.2;
+        black_hole.color = glm::vec3(0.0, 1.0, 0.0);
         black_hole.is_black_hole = true;
         app->simulation.add_body(black_hole);
         break;
@@ -155,6 +162,10 @@ void mainloop(GLFWwindow *window) {
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glEnable(GL_DEPTH_TEST);
+
+  glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int button, int action, int mods) {
+    ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+  });
 
   // game-loop timing (=> decouples fps from physics updates)
   double t = 0.0;
