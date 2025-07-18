@@ -6,6 +6,9 @@
 #include <iostream>
 #include "shaders.hpp"
 
+#define VERTEX_SHADER   "shaders/vertex_shader.glsl"
+#define FRAGMENT_SHADER "shaders/fragment_shader.glsl"
+
 std::string load_shader(const char *shader_path) {
   std::ifstream shader_file(shader_path);
   if (!shader_file) {
@@ -18,8 +21,8 @@ std::string load_shader(const char *shader_path) {
 }
 
 unsigned int create_shader_program() {
-  std::string vertex_shader_str   = load_shader("shaders/vertex_shader.glsl");
-  std::string fragment_shader_str = load_shader("shaders/fragment_shader.glsl");
+  std::string vertex_shader_str   = load_shader(VERTEX_SHADER);
+  std::string fragment_shader_str = load_shader(FRAGMENT_SHADER);
   const char *vertex_shader_src   = vertex_shader_str.c_str();
   const char *fragment_shader_src = fragment_shader_str.c_str();
 
