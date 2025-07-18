@@ -68,10 +68,11 @@ glm_inc = include_directories('glm', is_system: true)
 
 app_sources = files(
   'src/main.cpp',
-  'src/helper.cpp',
+  'src/callbacks.cpp',
   'src/gui.cpp',
   'src/simulation.cpp',
   'src/mainloop.cpp',
+  'src/shaders.cpp'
 )
 
 glad_sources = files('glad/src/glad.c')
