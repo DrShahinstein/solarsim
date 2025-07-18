@@ -12,23 +12,29 @@ struct CelestialBody {
   double radius;
   glm::vec3 color;
   bool is_black_hole = false;
+  glm::dvec3 previous_acceleration;
 };
+
+class Simulation;
+using Integrator = void (Simulation::*)(double);
 
 class Simulation {
 public:
   Simulation();
-  void update(double dt);
   void add_body(const CelestialBody &body);
   void clear_bodies();
   void setG(double value);
   std::vector<CelestialBody> &get_bodies();
+  void update(double dt);
   void reset_to_solar_system();
-  void apply_post_newtonian_corrections();
-
-private:
   std::vector<CelestialBody> bodies;
   double G;
+
+private:
   void compute_forces();
+  void apply_post_newtonian_corrections();
+  void integrate_velocity_verlet(double dt);
+  Integrator current_integrator;
 };
 
 #endif
