@@ -85,7 +85,7 @@ imgui_sources = files(
   'imgui/backends/imgui_impl_opengl3.cpp',
 )
 
-program_install_subdir = 'app'
+program_install_subdir = 'dist'
 
 executable('solarsim',
   app_sources,
