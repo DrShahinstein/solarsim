@@ -129,7 +129,6 @@ void mainloop(GLFWwindow *window) {
   });
 
   // game-loop timing (=> decouples fps from physics updates)
-  double t = 0.0;
   const double dt = 1.0 / 100;
   double current_time = glfwGetTime();
   double accumulator = 0.0;
@@ -164,7 +163,6 @@ void mainloop(GLFWwindow *window) {
         app_ptr->simulation.update(dt * app_ptr->simulation_speed);
       }
       accumulator -= dt;
-      t += dt;
     }
 
     // rendering
