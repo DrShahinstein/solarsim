@@ -1,14 +1,14 @@
-#include "simulation.hpp"
+#include <algorithm>
 #include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
-
-constexpr double DEFAULT_G = 0.000295912208;
+#include "simulation.hpp"
 
 Simulation::Simulation() : G(DEFAULT_G)              { current_integrator = &Simulation::integrate_velocity_verlet; }
 void Simulation::add_body(const CelestialBody &body) { bodies.push_back(body); }
 void Simulation::clear_bodies()                      { bodies.clear(); }
 void Simulation::setG(double value)                  { G = value; }
+double Simulation::getG()                      const { return G; }
 std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
 
 void Simulation::compute_forces() {
@@ -71,7 +71,16 @@ void Simulation::apply_post_newtonian_corrections() {
   }
 }
 
-void Simulation::update(double dt) { (this->*current_integrator)(dt); }
+void Simulation::update(double dt) {
+  (this->*current_integrator)(dt);
+}
+
+void Simulation::remove_marked_bodies() {
+  bodies.erase(
+      std::remove_if(bodies.begin(), bodies.end(),
+                     [](const CelestialBody &body) { return body.mass <= 0; }),
+      bodies.end());
+}
 
 void Simulation::integrate_velocity_verlet(double dt) {
   for (auto &body : bodies) {
