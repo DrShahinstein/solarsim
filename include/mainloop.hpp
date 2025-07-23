@@ -15,6 +15,11 @@ struct AppState{
   double lastX;
   double lastY;
   bool first_mouse;
+  struct {
+    bool show_help;
+    bool show_stats;
+    bool show_caminfo;
+  } gui_props;
 };
 
 void mainloop(GLFWwindow *window);
