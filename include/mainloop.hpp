@@ -11,7 +11,7 @@ struct AppState{
   bool is_mouse_captured;
   bool is_paused;
   bool gui_visible;
-  float simulation_speed = 1.0f;
+  float simulation_speed=1.0f;
   double lastX;
   double lastY;
   bool first_mouse;
@@ -19,6 +19,7 @@ struct AppState{
     bool show_help;
     bool show_stats;
     bool show_caminfo;
+    bool lighting_enabled=true;
   } gui_props;
 };
 
