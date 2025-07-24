@@ -168,6 +168,33 @@ void render_gui(AppState &app) {
     }
   }
 
+  if (ImGui::CollapsingHeader("Add Body")) {
+    static CelestialBody new_body;
+    new_body.mass          = app.gui_props.body_editor.mass;
+    new_body.radius        = app.gui_props.body_editor.radius;
+    new_body.color         = app.gui_props.body_editor.color;
+    new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
+    new_body.position      = app.camera->m_position + app.camera->m_front * 1.0f;
+    new_body.velocity      = glm::dvec3(0.0, 0.0, 0.0);
+
+    if (ImGui::SliderFloat("Mass", &app.gui_props.body_editor.mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
+      new_body.mass = app.gui_props.body_editor.mass;
+    }
+    if (ImGui::SliderFloat("Radius", &app.gui_props.body_editor.radius, 0.01f, 2.0f)) {
+      new_body.radius = app.gui_props.body_editor.radius;
+    }
+    if (ImGui::ColorEdit3("Color", &app.gui_props.body_editor.color[0])) {
+      new_body.color = app.gui_props.body_editor.color;
+    }
+
+    ImGui::Checkbox("Black Hole", &app.gui_props.body_editor.is_black_hole);
+    new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
+
+    if (ImGui::Button("Add")) {
+      app.simulation.add_body(new_body);
+    }
+  }
+
   if (app.gui_props.show_stats) {
     render_simulation_stats(app, calc_frame_time());
   }
