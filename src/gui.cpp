@@ -116,7 +116,7 @@ void render_help_window() {
   ImGui::Separator();
   ImGui::Text("Simulation Controls:");
   ImGui::BulletText("R: Reset to solar system");
-  ImGui::BulletText("B: Add black hole at cursor");
+  ImGui::BulletText("B: Add your custom celestial body at cursor");
   ImGui::BulletText("P: Toggle pause");
   ImGui::End();
 }
