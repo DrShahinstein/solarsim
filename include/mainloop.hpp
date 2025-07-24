@@ -20,6 +20,12 @@ struct AppState{
     bool show_stats;
     bool show_caminfo;
     bool lighting_enabled=true;
+    struct {
+      float mass=0.1f;
+      float radius=0.1f;
+      glm::vec3 color=glm::vec3(1.0f, 0.0f, 0.0f); // red
+      bool is_black_hole=false;
+    } body_editor;
   } gui_props;
 };
 
