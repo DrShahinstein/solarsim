@@ -51,3 +51,17 @@ $ ./build.sh --run
 <img width="1920" height="1078" alt="Image" src="https://github.com/user-attachments/assets/5d307a4b-d7f8-40eb-bd14-91ce7dbe9ee6" />
 <br/>
 Press <kbd>esc</kbd> to view controls and un-capture cursor.
+
+## Controls
+
+| Key / Input      | Action                                   |
+|------------------|------------------------------------------|
+| **W / A / S / D**| Move camera horizontally                 |
+| **Space**        | Move camera upward                       |
+| **Left Shift**   | Move camera downward                     |
+| **Mouse**        | Look around (when mouse is captured)     |
+| **ESC**          | Toggle mouse capture and GUI visibility  |
+| **R**            | Reset simulation to the solar system     |
+| **B**            | Add a custom celestial body at the cursor|
+| **P**            | Toggle pause/resume simulation           |
+| **C**            | Remove last celestial body               |
