@@ -101,6 +101,14 @@ void mainloop(GLFWwindow *window) {
         app->simulation.add_body(new_body);
         break;
       }
+      case GLFW_KEY_P:
+        app->is_paused = !app->is_paused;
+        break;
+      case GLFW_KEY_C:
+        if (!app->simulation.get_bodies().empty()) {
+          app->simulation.get_bodies().pop_back();
+        }
+        break;
       }
     }
   });
