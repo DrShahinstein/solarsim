@@ -1,4 +1,5 @@
 # Solarsim
+
 3D solar system simulator using OpenGL for graphics.
 
 ## Dependencies Installation
@@ -8,12 +9,14 @@ Get [meson](https://mesonbuild.com/Getting-meson.html) first.
 ### Linux
 
 #### => pacman
+
 ```bash
 $ sudo pacman -S glfw glm glew mesa libx11 libxi libxrandr \
                  libxinerama libxcursor pkgconf base-devel
 ```
 
 #### => apt
+
 ```bash
 $ sudo apt install libglfw3-dev libgl1-mesa-dev \
                    libx11-dev libxi-dev libxrandr-dev libxinerama-dev \
@@ -22,6 +25,7 @@ $ sudo apt install libglfw3-dev libgl1-mesa-dev \
 ```
 
 #### => dnf
+
 ```bash
 $ sudo dnf install glfw-devel mesa-libGL-devel \
                    libX11-devel libXi-devel libXrandr-devel \
@@ -31,7 +35,7 @@ $ sudo dnf install glfw-devel mesa-libGL-devel \
 ### Macos
 
 ```bash
-$ brew install gcc pkg-config glfw glm 
+$ brew install gcc pkg-config glfw glm
 ```
 
 ### Windows
@@ -54,14 +58,13 @@ Press <kbd>esc</kbd> to view controls and un-capture cursor.
 
 ## Controls
 
-| Key / Input      | Action                                   |
-|------------------|------------------------------------------|
-| **W / A / S / D**| Move camera horizontally                 |
-| **Space**        | Move camera upward                       |
-| **Left Shift**   | Move camera downward                     |
-| **Mouse**        | Look around (when mouse is captured)     |
-| **ESC**          | Toggle mouse capture and GUI visibility  |
-| **R**            | Reset simulation to the solar system     |
-| **B**            | Add a custom celestial body at the cursor|
-| **P**            | Toggle pause/resume simulation           |
-| **C**            | Remove last celestial body               |
+| Key / Input       | Action                                    |
+| ----------------- | ----------------------------------------- |
+| <kbd>WASD</kbd>   | Move camera horizontally                  |
+| <kbd>SPACE</kbd>  | Move camera upward                        |
+| <kbd>LSHIFT</kbd> | Move camera downward                      |
+| <kbd>ESC</kbd>    | Toggle mouse capture and GUI visibility   |
+| <kbd>R</kbd>      | Reset simulation to the solar system      |
+| <kbd>B</kbd>      | Add a custom celestial body at the cursor |
+| <kbd>P</kbd>      | Toggle pause/resume simulation            |
+| <kbd>C</kbd>      | Remove last celestial body                |
