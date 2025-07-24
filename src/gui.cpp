@@ -118,6 +118,7 @@ void render_help_window() {
   ImGui::BulletText("R: Reset to solar system");
   ImGui::BulletText("B: Add your custom celestial body at cursor");
   ImGui::BulletText("P: Toggle pause");
+  ImGui::BulletText("C: Remove last celestial body");
   ImGui::End();
 }
 
