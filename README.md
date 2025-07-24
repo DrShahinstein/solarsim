@@ -64,7 +64,7 @@ Press <kbd>esc</kbd> to view controls and un-capture cursor.
 | <kbd>SPACE</kbd>  | Move camera upward                        |
 | <kbd>LSHIFT</kbd> | Move camera downward                      |
 | <kbd>ESC</kbd>    | Toggle mouse capture and GUI visibility   |
-| <kbd>R</kbd>      | Reset simulation to the solar system      |
+| <kbd>R</kbd>      | Reset simulation                          |
 | <kbd>B</kbd>      | Add a custom celestial body at the cursor |
 | <kbd>P</kbd>      | Toggle pause/resume simulation            |
 | <kbd>C</kbd>      | Remove last celestial body                |
