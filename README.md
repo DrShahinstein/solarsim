@@ -48,6 +48,6 @@ $ ./build.sh --run
 
 ## Screenshot
 
-<img width="2572" height="1520" alt="Image" src="https://github.com/user-attachments/assets/d63f097d-c256-4424-838b-0b2c40ae9de3" />
-
+<img width="1920" height="1078" alt="Image" src="https://github.com/user-attachments/assets/5d307a4b-d7f8-40eb-bd14-91ce7dbe9ee6" />
+<br/>
 Press <kbd>esc</kbd> to view controls and un-capture cursor.
