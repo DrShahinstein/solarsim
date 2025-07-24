@@ -147,6 +147,8 @@ void render_gui(AppState &app) {
     app.simulation.setG(static_cast<double>(G));
   }
 
+  ImGui::Checkbox("Enable lighting", &app.gui_props.lighting_enabled);
+
   ImGui::Separator();
   ImGui::Text("Show Windows:");
   ImGui::SameLine();
