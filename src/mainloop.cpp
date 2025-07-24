@@ -184,6 +184,7 @@ void mainloop(GLFWwindow *window) {
     glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(app_ptr->camera->m_right));
     glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
     glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
+    glUniform1i(glGetUniformLocation(shader_program, "lighting_enabled"), app_ptr->gui_props.lighting_enabled);
 
     for (size_t i = 0; i < bodies.size(); i++) {
       std::string index = "bodies[" + std::to_string(i) + "]";
