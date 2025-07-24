@@ -9,6 +9,7 @@ uniform vec3 camera_up;
 uniform vec3 camera_right;
 uniform float aspect_ratio;
 uniform int num_bodies;
+uniform bool lighting_enabled;
 
 struct CelestialBody {
     vec3 position;
@@ -84,20 +85,18 @@ vec3 ray_march(vec3 ro, vec3 rd) {
     }
     
     vec3 color = bodies[body_index].color;
+    if (body_index == 0) return color; // sun is always lit
 
-    // sun must be fully lit
-    if (body_index == 0) {
-        return color;
-    }
-
-    vec3 normal      = estimate_normal(p);
-    vec3 light_dir   = normalize(bodies[0].position - p);
-    float diff       = max(dot(normal, light_dir), 0.0);
-    vec3 view_dir    = normalize(ro - p);
-    vec3 reflect_dir = reflect(-light_dir, normal);
-    float spec       = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
-    float ambient    = 0.1;
-    return color * (ambient + diff) + vec3(0.8) * spec;
+    if (lighting_enabled) {
+      vec3 normal      = estimate_normal(p);
+      vec3 light_dir   = normalize(bodies[0].position - p);
+      float diff       = max(dot(normal, light_dir), 0.0);
+      vec3 view_dir    = normalize(ro - p);
+      vec3 reflect_dir = reflect(-light_dir, normal);
+      float spec       = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
+      float ambient    = 0.1;
+      return color * (ambient + diff) + vec3(0.8) * spec;
+    } else return color;
 }
 
 
