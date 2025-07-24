@@ -91,14 +91,14 @@ void mainloop(GLFWwindow *window) {
         app->simulation.reset_to_solar_system();
         break;
       case GLFW_KEY_B: {
-        CelestialBody black_hole;
-        black_hole.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
-        black_hole.velocity = glm::dvec3(0.0);
-        black_hole.mass = 100.0;
-        black_hole.radius = 0.2;
-        black_hole.color = glm::vec3(0.0, 1.0, 0.0);
-        black_hole.is_black_hole = true;
-        app->simulation.add_body(black_hole);
+        CelestialBody new_body;
+        new_body.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
+        new_body.velocity = glm::dvec3(0.0);
+        new_body.mass = app->gui_props.body_editor.mass;
+        new_body.radius = app->gui_props.body_editor.radius;
+        new_body.color = app->gui_props.body_editor.color;
+        new_body.is_black_hole = app->gui_props.body_editor.is_black_hole;
+        app->simulation.add_body(new_body);
         break;
       }
       }
