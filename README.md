@@ -52,11 +52,11 @@ $ ./build.sh --run
 
 ## Screenshot
 
-<img width="1920" height="1078" alt="Image" src="https://github.com/user-attachments/assets/5d307a4b-d7f8-40eb-bd14-91ce7dbe9ee6" />
-<br/>
-Press <kbd>esc</kbd> to view controls and un-capture cursor.
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/c0dc562a-703f-46c0-b66f-1d64f529cc80" />
 
-## Controls
+<br/>
+
+## Keys
 
 | Key / Input       | Action                                    |
 | ----------------- | ----------------------------------------- |
