@@ -26,6 +26,8 @@ struct CalestialBodyData {
   glm::vec3 position;
   glm::vec3 color;
   float radius;
+  float mass;
+  int is_black_hole;
 };
 
 void mainloop(GLFWwindow *window) {
@@ -91,6 +93,7 @@ void mainloop(GLFWwindow *window) {
         app->simulation.reset_to_solar_system();
         break;
       case GLFW_KEY_B: {
+        if (app->simulation.bodies.size() >= MAX_BODIES) break;
         CelestialBody new_body;
         new_body.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
         new_body.velocity = glm::dvec3(0.0);
@@ -193,15 +196,22 @@ void mainloop(GLFWwindow *window) {
     glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
     glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
     glUniform1i(glGetUniformLocation(shader_program, "lighting_enabled"), app_ptr->gui_props.lighting_enabled);
+    glUniform1f(glGetUniformLocation(shader_program, "G"), static_cast<float>(app.simulation.getG()));
 
-    for (size_t i = 0; i < bodies.size(); i++) {
+    for (size_t i = 0; i < bodies.size() && i < MAX_BODIES; i++) {
       std::string index = "bodies[" + std::to_string(i) + "]";
+
       CalestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
-                                     static_cast<float>(bodies[i].radius)};
+                                     static_cast<float>(bodies[i].radius),
+                                     static_cast<float>(bodies[i].mass), 
+                                     bodies[i].is_black_hole ? 1 : 0};
+
       glUniform3fv(glGetUniformLocation(shader_program, (index + ".position").c_str()), 1, glm::value_ptr(body_data.position));
       glUniform1f(glGetUniformLocation(shader_program, (index + ".radius").c_str()), body_data.radius);
       glUniform3fv(glGetUniformLocation(shader_program, (index + ".color").c_str()), 1, glm::value_ptr(body_data.color));
+      glUniform1i(glGetUniformLocation(shader_program, (index + ".is_black_hole").c_str()), body_data.is_black_hole);
+      glUniform1f(glGetUniformLocation(shader_program, (index + ".mass").c_str()), body_data.mass);
     }
 
     glBindVertexArray(quad_VAO);
