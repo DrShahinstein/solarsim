@@ -5,6 +5,8 @@
 #include "simulation.hpp"
 #include "camera.hpp"
 
+#define MAX_BODIES 20
+
 struct AppState{
   Simulation simulation;
   Camera *camera;
@@ -23,7 +25,7 @@ struct AppState{
     struct {
       float mass=0.1f;
       float radius=0.1f;
-      glm::vec3 color=glm::vec3(1.0f, 0.0f, 0.0f); // red
+      glm::vec3 color=glm::vec3(1.0f, 0.0f, 0.0f);
       bool is_black_hole=false;
     } body_editor;
   } gui_props;
