@@ -38,7 +38,6 @@ void Simulation::compute_forces() {
 }
 
 void Simulation::apply_post_newtonian_corrections() {
-  const double C = 173.1446;
   const double C_SQ = C * C;
 
   std::vector<CelestialBody *> blackholes;
