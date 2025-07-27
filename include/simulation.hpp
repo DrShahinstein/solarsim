@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#define C 173.1446
 #define DEFAULT_G 0.000295912208
 
 struct CelestialBody {
