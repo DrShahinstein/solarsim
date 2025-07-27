@@ -35,7 +35,7 @@ void render_body_editor(CelestialBody &body, int index) {
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.6f);
 
     float mass = static_cast<float>(body.mass);
-    if (ImGui::SliderFloat("Mass", &mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
+    if (ImGui::SliderFloat("Mass", &mass, 1e-8f, 1000.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
       body.mass = static_cast<double>(mass);
     }
 
