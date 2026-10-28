@@ -31,7 +31,12 @@ const float C = 173.1446; // speed of light in AU/day
 const float C_SQ = C * C;
 const float PI = 3.14159265359;
 
-vec3 ray_march(vec3 ro, vec3 rd);
+struct Hit {
+  vec3 color;
+  bool hit;
+};
+
+Hit ray_march(vec3 ro, vec3 rd);
 vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos);
 float hash(vec2 p);
 
@@ -39,11 +44,14 @@ float sphere_distance(vec3 p, vec3 center, float radius) {
   return length(p - center) - radius;
 }
 
+float body_radius(int index) {
+  return bodies[index].is_black_hole == 1 ? bodies[index].event_horizon : bodies[index].radius;
+}
+
 float scene_distance(vec3 p) {
   float min_dist = MAX_DIST;
   for (int i = 0; i < num_bodies; i++) {
-    if (bodies[i].is_black_hole == 1) continue;
-    float d = sphere_distance(p, bodies[i].position, bodies[i].radius);
+    float d = sphere_distance(p, bodies[i].position, body_radius(i));
     min_dist = min(min_dist, d);
   }
   return min_dist;
@@ -95,10 +103,11 @@ void main() {
   }
 
   // 3. MARCH THE (POSSIBLY BENT) RAY THROUGH THE SCENE
-  vec3 color = ray_march(ray_origin, ray_dir);
+  Hit hit = ray_march(ray_origin, ray_dir);
+  vec3 color = hit.color;
 
   // 4. IF NO OBJECTS WERE HIT, CHECK FOR ACCRETION DISK
-  if (color == vec3(0.0)) { // assuming ray_march returns black for no hit
+  if (!hit.hit) {
     bool disk_hit = false;
     for (int i = 0; i < num_bodies; i++) {
       if (bodies[i].is_black_hole == 1) {
@@ -133,19 +142,16 @@ void main() {
   FragColor = vec4(color, 1.0);
 }
 
-vec3 ray_march(vec3 ro, vec3 rd) {
+Hit ray_march(vec3 ro, vec3 rd) {
   float total_dist = 0.0;
   for (int i = 0; i < MAX_STEPS; i++) {
     vec3 p = ro + total_dist * rd;
     float dist = scene_distance(p);
     if (dist < SURF_DIST) {
-      // we hit something, now determine its color
       int body_index = -1;
       float min_dist = MAX_DIST;
       for (int j = 0; j < num_bodies; j++) {
-        if (bodies[j].is_black_hole == 1)
-          continue;
-        float d = sphere_distance(p, bodies[j].position, bodies[j].radius);
+        float d = sphere_distance(p, bodies[j].position, body_radius(j));
         if (d < min_dist) {
           min_dist = d;
           body_index = j;
@@ -153,11 +159,14 @@ vec3 ray_march(vec3 ro, vec3 rd) {
       }
 
       if (body_index < 0)
-        return vec3(0.0); // should not happen, but safe
+        return Hit(vec3(0.0), false);
+
+      if (bodies[body_index].is_black_hole == 1)
+        return Hit(vec3(0.0), true);
 
       vec3 color = bodies[body_index].color;
       if (body_index == light_index)
-        return color;
+        return Hit(color, true);
 
       if (lighting_enabled && light_index >= 0) {
         vec3 normal      = estimate_normal(p);
@@ -167,17 +176,17 @@ vec3 ray_march(vec3 ro, vec3 rd) {
         vec3 reflect_dir = reflect(-light_dir, normal);
         float spec       = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0);
         float ambient    = 0.1;
-        return color * (ambient + diff) + vec3(0.8) * spec;
+        return Hit(color * (ambient + diff) + vec3(0.8) * spec, true);
       } else {
-        return color;
+        return Hit(color, true);
       }
     }
     total_dist += dist;
     if (total_dist >= MAX_DIST) {
-      return vec3(0.0); // hit nothing, return black
+      return Hit(vec3(0.0), false);
     }
   }
-  return vec3(0.0); // hit nothing, return black
+  return Hit(vec3(0.0), false);
 }
 
 float hash(vec2 p) {
