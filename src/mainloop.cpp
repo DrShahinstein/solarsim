@@ -244,7 +244,6 @@ void mainloop(GLFWwindow *window) {
     while (accumulator >= dt && steps < MAX_STEPS_PER_FRAME) {
       if (!app_ptr->paused) {
         app_ptr->simulation.update(dt);
-        app_ptr->simulation.remove_marked_bodies();
       }
       accumulator -= dt;
       ++steps;
@@ -315,6 +314,7 @@ void mainloop(GLFWwindow *window) {
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    app_ptr->simulation.remove_marked_bodies();
     glfwSwapBuffers(window);
   }
 
