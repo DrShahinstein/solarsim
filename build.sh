@@ -9,6 +9,8 @@ if [[ "$1" == "--run" ]]; then
 else
     if [ ! -d build ]; then
         meson setup build --prefix "${PWD}/build" --wrap-mode "${WRAP_MODE}"
+    else
+        meson setup --reconfigure build --prefix "${PWD}/build" --wrap-mode "${WRAP_MODE}"
     fi
     meson compile -C build
     meson install -C build --skip-subprojects
