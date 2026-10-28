@@ -44,17 +44,8 @@ void render_body_editor(CelestialBody &body, int index) {
       body.radius = static_cast<double>(radius);
     }
 
-    float position[3] = {static_cast<float>(body.position.x),
-                         static_cast<float>(body.position.y),
-                         static_cast<float>(body.position.z)};
-    ImGui::InputFloat3("Position", position, "%.3f");
-    body.position = glm::dvec3(position[0], position[1], position[2]);
-
-    float velocity[3] = {static_cast<float>(body.velocity.x),
-                         static_cast<float>(body.velocity.y),
-                         static_cast<float>(body.velocity.z)};
-    ImGui::InputFloat3("Velocity", velocity, "%.6f");
-    body.velocity = glm::dvec3(velocity[0], velocity[1], velocity[2]);
+    ImGui::InputScalarN("Position", ImGuiDataType_Double, &body.position.x, 3, nullptr, nullptr, "%.6f");
+    ImGui::InputScalarN("Velocity", ImGuiDataType_Double, &body.velocity.x, 3, nullptr, nullptr, "%.6f");
 
     ImGui::ColorEdit3("Color", &body.color[0]);
     ImGui::Checkbox("Black Hole", &body.is_black_hole);
