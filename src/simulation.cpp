@@ -5,32 +5,58 @@
 #include "simulation.hpp"
 
 Simulation::Simulation() : G(DEFAULT_G) {}
+
 void Simulation::add_body(const CelestialBody &body) {
   if (bodies.size() >= MAX_BODIES) return;
   bodies.push_back(body);
   recompute_accelerations();
 }
-void Simulation::clear_bodies()                      { bodies.clear(); }
+
+void Simulation::clear_bodies() {
+  bodies.clear();
+}
+
 void Simulation::remove_last_body() {
   if (bodies.empty()) return;
   bodies.pop_back();
   recompute_accelerations();
 }
-void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
-double Simulation::getG()                      const { return G; }
-uint64_t Simulation::get_physics_steps()       const { return physics_steps; }
-size_t Simulation::body_count()                const { return bodies.size(); }
-const std::vector<CelestialBody> &Simulation::get_bodies() const { return bodies; }
-CelestialBody &Simulation::body(size_t index)        { return bodies[index]; }
-const CelestialBody &Simulation::body(size_t index)  const { return bodies[index]; }
+
+void Simulation::setG(double value) {
+  G = value; recompute_accelerations();
+}
+
+double Simulation::getG() const {
+  return G;
+}
+
+uint64_t Simulation::get_physics_steps() const {
+  return physics_steps;
+}
+
+size_t Simulation::body_count() const {
+  return bodies.size();
+}
+
+const std::vector<CelestialBody> &Simulation::get_bodies() const {
+  return bodies;
+}
+
+CelestialBody &Simulation::body(size_t index) {
+  return bodies[index];
+}
+
+const CelestialBody &Simulation::body(size_t index) const {
+  return bodies[index];
+}
 
 void Simulation::compute_forces() {
   for (auto &body : bodies) {
     body.acceleration = glm::dvec3(0.0);
   }
 
-  for (size_t i = 0; i < bodies.size(); ++i) {
-    for (size_t j = i + 1; j < bodies.size(); ++j) {
+  for (size_t i=0; i < bodies.size(); ++i) {
+    for (size_t j=i+1; j < bodies.size(); ++j) {
       auto &body1 = bodies[i];
       auto &body2 = bodies[j];
 
@@ -42,8 +68,8 @@ void Simulation::compute_forces() {
       if (distance_sq < 1e-12) continue;
 
       double force_magnitude = G * body1.mass * body2.mass / distance_sq;
-      glm::dvec3 force_dir = glm::normalize(r);
-      glm::dvec3 force = force_magnitude * force_dir;
+      glm::dvec3 force_dir   = glm::normalize(r);
+      glm::dvec3 force       = force_magnitude * force_dir;
 
       body1.acceleration += force / body1.mass;
       body2.acceleration -= force / body2.mass;
@@ -52,13 +78,13 @@ void Simulation::compute_forces() {
 }
 
 void Simulation::apply_post_newtonian_corrections() {
-  for (size_t i = 0; i < bodies.size(); ++i) {
+  for (size_t i=0; i < bodies.size(); ++i) {
     auto &bh = bodies[i];
     if (!bh.is_black_hole || bh.mass <= 0.0) continue;
 
     const double rs = bh.event_horizon_radius(G);
 
-    for (size_t j = 0; j < bodies.size(); ++j) {
+    for (size_t j=0; j < bodies.size(); ++j) {
       if (i == j) continue;
 
       auto &other = bodies[j];
@@ -94,10 +120,11 @@ void Simulation::update(double dt) {
 
 void Simulation::remove_marked_bodies() {
   const size_t previous_count = bodies.size();
+
   bodies.erase(
-      std::remove_if(bodies.begin(), bodies.end(),
-                     [](const CelestialBody &body) { return body.marked_for_deletion; }),
-      bodies.end());
+    std::remove_if(bodies.begin(), bodies.end(), [](const CelestialBody &body) { return body.marked_for_deletion; }), bodies.end()
+  );
+
   if (bodies.size() != previous_count) {
     recompute_accelerations();
   }
@@ -141,21 +168,21 @@ void Simulation::reset_to_solar_system() {
   };
 
   const Planet planets[] = {
-      {0.4, 1.65e-7, 0.02, glm::vec3(0.8, 0.8, 0.8)},
-      {0.8, 2.45e-6, 0.03, glm::vec3(0.9, 0.7, 0.0)},
-      {1.5, 3.0e-6, 0.03, glm::vec3(0.0, 0.0, 1.0)},
-      {2.5, 3.2e-7, 0.02, glm::vec3(1.0, 0.0, 0.0)},
-      {5.2, 9.5e-4, 0.08, glm::vec3(0.8, 0.6, 0.4)},
-      {9.5, 2.75e-4, 0.07, glm::vec3(0.9, 0.8, 0.5)},
-      {19.2, 4.4e-5, 0.05, glm::vec3(0.5, 0.8, 1.0)},
-      {30.1, 5.15e-5, 0.05, glm::vec3(0.0, 0.0, 0.8)},
+    {0.4, 1.65e-7, 0.02,  glm::vec3(0.8, 0.8, 0.8)},
+    {0.8, 2.45e-6, 0.03,  glm::vec3(0.9, 0.7, 0.0)},
+    {1.5, 3.0e-6, 0.03,   glm::vec3(0.0, 0.0, 1.0)},
+    {2.5, 3.2e-7, 0.02,   glm::vec3(1.0, 0.0, 0.0)},
+    {5.2, 9.5e-4, 0.08,   glm::vec3(0.8, 0.6, 0.4)},
+    {9.5, 2.75e-4, 0.07,  glm::vec3(0.9, 0.8, 0.5)},
+    {19.2, 4.4e-5, 0.05,  glm::vec3(0.5, 0.8, 1.0)},
+    {30.1, 5.15e-5, 0.05, glm::vec3(0.0, 0.0, 0.8)},
   };
 
   for (const auto &planet : planets) {
-    const double total_mass = sun_mass + planet.mass;
+    const double total_mass     = sun_mass + planet.mass;
     const double relative_speed = std::sqrt(G * total_mass / planet.distance);
-    const double sun_share = planet.mass / total_mass;
-    const double planet_share = sun_mass / total_mass;
+    const double sun_share      = planet.mass / total_mass;
+    const double planet_share   = sun_mass / total_mass;
 
     sun_velocity.y -= relative_speed * sun_share;
 
@@ -171,3 +198,4 @@ void Simulation::reset_to_solar_system() {
   bodies[0].velocity = sun_velocity;
   recompute_accelerations();
 }
+
