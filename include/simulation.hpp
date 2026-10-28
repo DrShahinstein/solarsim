@@ -8,14 +8,14 @@
 #define DEFAULT_G 0.000295912208
 
 struct CelestialBody {
-  glm::dvec3 position;
-  glm::dvec3 velocity;
-  glm::dvec3 acceleration;
-  double mass;
-  double radius;
-  glm::vec3 color;
+  glm::dvec3 position{0.0};
+  glm::dvec3 velocity{0.0};
+  glm::dvec3 acceleration{0.0};
+  double mass = 0.0;
+  double radius = 0.0;
+  glm::vec3 color{0.0};
   bool is_black_hole = false;
-  glm::dvec3 previous_acceleration;
+  glm::dvec3 previous_acceleration{0.0};
 };
 
 class Simulation;

@@ -94,7 +94,7 @@ void mainloop(GLFWwindow *window) {
         break;
       case GLFW_KEY_B: {
         if (app->simulation.bodies.size() >= MAX_BODIES) break;
-        CelestialBody new_body;
+        CelestialBody new_body{};
         new_body.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
         new_body.velocity = glm::dvec3(0.0);
         new_body.mass = app->gui_props.body_editor.mass;

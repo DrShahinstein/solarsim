@@ -18,17 +18,17 @@ struct AppState{
   double lastY;
   bool first_mouse;
   struct {
-    bool show_help;
-    bool show_stats;
-    bool show_caminfo;
-    bool lighting_enabled=true;
+    bool show_help = false;
+    bool show_stats = false;
+    bool show_caminfo = false;
+    bool lighting_enabled = true;
     struct {
-      float mass=0.1f;
-      float radius=0.1f;
-      glm::vec3 color=glm::vec3(1.0f, 0.0f, 0.0f);
-      bool is_black_hole=false;
+      float mass = 0.1f;
+      float radius = 0.1f;
+      glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
+      bool is_black_hole = false;
     } body_editor;
-  } gui_props;
+  } gui_props{};
 };
 
 void mainloop(GLFWwindow *window);
