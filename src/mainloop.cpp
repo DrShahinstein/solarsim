@@ -6,9 +6,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <chrono>
 #include <algorithm>
-#include <thread>
 #include <iostream>
 #include "mainloop.hpp"
 #include "callbacks.hpp"
@@ -204,6 +202,7 @@ void mainloop(GLFWwindow *window) {
   });
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSwapInterval(1);
   glEnable(GL_DEPTH_TEST);
 
   glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int button, int action, int mods) {
@@ -215,11 +214,6 @@ void mainloop(GLFWwindow *window) {
   constexpr int MAX_STEPS_PER_FRAME = 2000;
   double current_time = glfwGetTime();
   double accumulator = 0.0;
-
-  // frame limiting
-  using Clock = std::chrono::high_resolution_clock;
-  constexpr double TARGET_FRAME_TIME = 1.0 / 60.0; // 60 FPS
-  auto frame_start = Clock::now();
 
   // loop
   while (!glfwWindowShouldClose(window)) {
@@ -315,21 +309,6 @@ void mainloop(GLFWwindow *window) {
     }
 
     glfwSwapBuffers(window);
-
-    auto frame_end = Clock::now();
-    auto elapsed_time = std::chrono::duration<double>(frame_end - frame_start).count();
-    double sleep_duration = TARGET_FRAME_TIME - elapsed_time;
-
-    if (sleep_duration > 0) {
-      std::this_thread::sleep_for(std::chrono::duration<double>(sleep_duration * 0.9));
-
-      auto spin_start = Clock::now();
-      do {
-        std::this_thread::yield();
-      } while (std::chrono::duration<double>(Clock::now() - spin_start).count() < sleep_duration * 0.1);
-    }
-
-    frame_start = Clock::now();
   }
 
   // cleanup

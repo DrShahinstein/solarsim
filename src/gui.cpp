@@ -117,8 +117,8 @@ void render_help_window() {
 }
 
 double calc_frame_time() {
-  static auto last_time = std::chrono::high_resolution_clock::now();
-  auto now = std::chrono::high_resolution_clock::now();
+  static auto last_time = std::chrono::steady_clock::now();
+  auto now = std::chrono::steady_clock::now();
   double elapsed = std::chrono::duration<double>(now - last_time).count();
   last_time = now;
   return elapsed;
