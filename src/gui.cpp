@@ -132,7 +132,6 @@ void render_gui(AppState &app) {
   ImGui::SameLine();
   if (ImGui::Button("Reset")) {
     app.simulation.reset_to_solar_system();
-    app.simulation.setG(DEFAULT_G);
   }
 
   ImGui::SliderFloat("Simulation Speed", &app.simulation_speed, 0.1f, 1000.0f, "%.1f x", ImGuiSliderFlags_Logarithmic);

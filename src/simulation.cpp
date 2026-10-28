@@ -104,95 +104,55 @@ void Simulation::integrate_velocity_verlet(double dt) {
 
 void Simulation::reset_to_solar_system() {
   clear_bodies();
+  G = DEFAULT_G;
 
-  // sun
+  constexpr double sun_mass = 1.0;
+  glm::dvec3 sun_velocity(0.0);
+
   add_body({
-      .position = glm::dvec3(0.0, 0.0, 0.0), // position
-      .velocity = glm::dvec3(0.0),           // velocity
-      .acceleration = glm::dvec3(0.0),       // acceleration
-      .mass = 1.0,                           // mass (solar masses)
-      .radius = 0.2,                         // radius
-      .color = glm::vec3(1.0, 1.0, 0.0),     // yellow
+      .position = glm::dvec3(0.0),
+      .velocity = glm::dvec3(0.0),
+      .mass = sun_mass,
+      .radius = 0.2,
+      .color = glm::vec3(1.0, 1.0, 0.0),
       .is_star = true,
   });
 
-  // mercury
-  add_body({
-      glm::dvec3(0.4, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.031, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      1.65e-7,                     // mass (solar masses)
-      0.02,                        // radius
-      glm::vec3(0.8, 0.8, 0.8)     // gray
-  });
+  struct Planet {
+    double distance;
+    double mass;
+    double radius;
+    glm::vec3 color;
+  };
 
-  // venus
-  add_body({
-      glm::dvec3(0.8, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.023, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      2.45e-6,                     // mass (solar masses)
-      0.03,                        // radius
-      glm::vec3(0.9, 0.7, 0.0)     // yellowish
-  });
+  const Planet planets[] = {
+      {0.4, 1.65e-7, 0.02, glm::vec3(0.8, 0.8, 0.8)},
+      {0.8, 2.45e-6, 0.03, glm::vec3(0.9, 0.7, 0.0)},
+      {1.5, 3.0e-6, 0.03, glm::vec3(0.0, 0.0, 1.0)},
+      {2.5, 3.2e-7, 0.02, glm::vec3(1.0, 0.0, 0.0)},
+      {5.2, 9.5e-4, 0.08, glm::vec3(0.8, 0.6, 0.4)},
+      {9.5, 2.75e-4, 0.07, glm::vec3(0.9, 0.8, 0.5)},
+      {19.2, 4.4e-5, 0.05, glm::vec3(0.5, 0.8, 1.0)},
+      {30.1, 5.15e-5, 0.05, glm::vec3(0.0, 0.0, 0.8)},
+  };
 
-  // earth
-  add_body({
-      glm::dvec3(1.5, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.017, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      3e-6,                        // mass (solar masses)
-      0.03,                        // radius
-      glm::vec3(0.0, 0.0, 1.0)     // blue
-  });
+  for (const auto &planet : planets) {
+    const double total_mass = sun_mass + planet.mass;
+    const double relative_speed = std::sqrt(G * total_mass / planet.distance);
+    const double sun_share = planet.mass / total_mass;
+    const double planet_share = sun_mass / total_mass;
 
-  // mars
-  add_body({
-      glm::dvec3(2.5, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.015, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      3.2e-7,                      // mass (solar masses)
-      0.02,                        // radius
-      glm::vec3(1.0, 0.0, 0.0)     // red
-  });
+    sun_velocity.y -= relative_speed * sun_share;
 
-  // jupiter
-  add_body({
-      glm::dvec3(5.2, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.008, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      9.5e-4,                      // mass (solar masses)
-      0.08,                        // larger radius
-      glm::vec3(0.8, 0.6, 0.4)     // brownish
-  });
+    add_body({
+        .position = glm::dvec3(planet.distance, 0.0, 0.0),
+        .velocity = glm::dvec3(0.0, relative_speed * planet_share, 0.0),
+        .mass = planet.mass,
+        .radius = planet.radius,
+        .color = planet.color,
+    });
+  }
 
-  // saturn
-  add_body({
-      glm::dvec3(9.5, 0.0, 0.0),   // position (AU)
-      glm::dvec3(0.0, 0.006, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      2.75e-4,                     // mass (solar masses)
-      0.07,                        // radius
-      glm::vec3(0.9, 0.8, 0.5)     // light brown
-  });
-
-  // uranus
-  add_body({
-      glm::dvec3(19.2, 0.0, 0.0),  // position (AU)
-      glm::dvec3(0.0, 0.004, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      4.4e-5,                      // mass (solar masses)
-      0.05,                        // radius
-      glm::vec3(0.5, 0.8, 1.0)     // light blue
-  });
-
-  // neptune
-  add_body({
-      glm::dvec3(30.1, 0.0, 0.0),  // position (AU)
-      glm::dvec3(0.0, 0.003, 0.0), // velocity (AU/day)
-      glm::dvec3(0.0),             // acceleration
-      5.15e-5,                     // mass (solar masses)
-      0.05,                        // radius
-      glm::vec3(0.0, 0.0, 0.8)     // blue
-  });
+  bodies[0].velocity = sun_velocity;
+  recompute_accelerations();
 }
