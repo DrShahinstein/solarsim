@@ -15,6 +15,7 @@ struct CelestialBody {
   double radius = 0.0;
   glm::vec3 color{0.0};
   bool is_black_hole = false;
+  bool is_star = false;
   glm::dvec3 previous_acceleration{0.0};
 };
 

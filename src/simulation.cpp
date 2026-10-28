@@ -103,12 +103,13 @@ void Simulation::reset_to_solar_system() {
 
   // sun
   add_body({
-      glm::dvec3(0.0, 0.0, 0.0), // position
-      glm::dvec3(0.0),           // velocity
-      glm::dvec3(0.0),           // acceleration
-      1.0,                       // mass (solar masses)
-      0.2,                       // radius
-      glm::vec3(1.0, 1.0, 0.0)   // yellow
+      .position = glm::dvec3(0.0, 0.0, 0.0), // position
+      .velocity = glm::dvec3(0.0),           // velocity
+      .acceleration = glm::dvec3(0.0),       // acceleration
+      .mass = 1.0,                           // mass (solar masses)
+      .radius = 0.2,                         // radius
+      .color = glm::vec3(1.0, 1.0, 0.0),     // yellow
+      .is_star = true,
   });
 
   // mercury

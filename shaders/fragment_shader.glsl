@@ -9,6 +9,7 @@ uniform vec3 camera_up;
 uniform vec3 camera_right;
 uniform float aspect_ratio;
 uniform int num_bodies;
+uniform int light_index;
 uniform bool lighting_enabled;
 uniform float G;
 
@@ -154,12 +155,12 @@ vec3 ray_march(vec3 ro, vec3 rd) {
         return vec3(0.0); // should not happen, but safe
 
       vec3 color = bodies[body_index].color;
-      if (body_index == 0)
-        return color; // sun is always lit
+      if (body_index == light_index)
+        return color;
 
-      if (lighting_enabled) {
+      if (lighting_enabled && light_index >= 0) {
         vec3 normal      = estimate_normal(p);
-        vec3 light_dir   = normalize(bodies[0].position - p);
+        vec3 light_dir   = normalize(bodies[light_index].position - p);
         float diff       = max(dot(normal, light_dir), 0.0);
         vec3 view_dir    = normalize(ro - p);
         vec3 reflect_dir = reflect(-light_dir, normal);

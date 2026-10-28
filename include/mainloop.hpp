@@ -27,6 +27,7 @@ struct AppState{
       float radius = 0.1f;
       glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
       bool is_black_hole = false;
+      bool is_star = false;
     } body_editor;
   } gui_props{};
 };

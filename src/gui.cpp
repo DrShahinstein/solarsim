@@ -49,6 +49,7 @@ void render_body_editor(CelestialBody &body, int index) {
 
     ImGui::ColorEdit3("Color", &body.color[0]);
     ImGui::Checkbox("Black Hole", &body.is_black_hole);
+    ImGui::Checkbox("Star", &body.is_star);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
     if (ImGui::Button(("Delete##" + std::to_string(index)).c_str())) body.mass = 0;
@@ -161,11 +162,12 @@ void render_gui(AppState &app) {
   }
 
   if (ImGui::CollapsingHeader("Add Body") && app.simulation.bodies.size() < MAX_BODIES) {
-    static CelestialBody new_body;
+    static CelestialBody new_body{};
     new_body.mass          = app.gui_props.body_editor.mass;
     new_body.radius        = app.gui_props.body_editor.radius;
     new_body.color         = app.gui_props.body_editor.color;
     new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
+    new_body.is_star       = app.gui_props.body_editor.is_star;
     new_body.position      = app.camera->m_position + app.camera->m_front * 1.0f;
     new_body.velocity      = glm::dvec3(0.0, 0.0, 0.0);
 
@@ -181,6 +183,9 @@ void render_gui(AppState &app) {
 
     ImGui::Checkbox("Black Hole", &app.gui_props.body_editor.is_black_hole);
     new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
+
+    ImGui::Checkbox("Star", &app.gui_props.body_editor.is_star);
+    new_body.is_star = app.gui_props.body_editor.is_star;
 
     if (ImGui::Button("Add")) {
       app.simulation.add_body(new_body);

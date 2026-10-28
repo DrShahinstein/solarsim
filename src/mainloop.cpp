@@ -103,6 +103,7 @@ void mainloop(GLFWwindow *window) {
         new_body.radius = app->gui_props.body_editor.radius;
         new_body.color = app->gui_props.body_editor.color;
         new_body.is_black_hole = app->gui_props.body_editor.is_black_hole;
+        new_body.is_star = app->gui_props.body_editor.is_star;
         app->simulation.add_body(new_body);
         break;
       }
@@ -225,6 +226,15 @@ void mainloop(GLFWwindow *window) {
     glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
     glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
     glUniform1i(glGetUniformLocation(shader_program, "lighting_enabled"), app_ptr->gui_props.lighting_enabled);
+
+    int light_index = -1;
+    for (size_t i = 0; i < bodies.size(); i++) {
+      if (bodies[i].is_star) {
+        light_index = static_cast<int>(i);
+        break;
+      }
+    }
+    glUniform1i(glGetUniformLocation(shader_program, "light_index"), light_index);
     glUniform1f(glGetUniformLocation(shader_program, "G"), static_cast<float>(app.simulation.getG()));
 
     for (size_t i = 0; i < bodies.size() && i < MAX_BODIES; i++) {
