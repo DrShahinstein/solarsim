@@ -25,7 +25,6 @@ struct CelestialBodyData {
   glm::vec3 position;
   glm::vec3 color;
   float radius;
-  float mass;
   float event_horizon;
   int is_black_hole;
 };
@@ -34,7 +33,6 @@ struct BodyUniforms {
   GLint position;
   GLint radius;
   GLint color;
-  GLint mass;
   GLint event_horizon;
   GLint is_black_hole;
 };
@@ -81,7 +79,6 @@ ShaderUniforms get_uniform_locations(unsigned int shader_program) {
     uniforms.bodies[i].position       = glGetUniformLocation(shader_program, (index + ".position").c_str());
     uniforms.bodies[i].radius         = glGetUniformLocation(shader_program, (index + ".radius").c_str());
     uniforms.bodies[i].color          = glGetUniformLocation(shader_program, (index + ".color").c_str());
-    uniforms.bodies[i].mass           = glGetUniformLocation(shader_program, (index + ".mass").c_str());
     uniforms.bodies[i].event_horizon  = glGetUniformLocation(shader_program, (index + ".event_horizon").c_str());
     uniforms.bodies[i].is_black_hole  = glGetUniformLocation(shader_program, (index + ".is_black_hole").c_str());
   }
@@ -291,7 +288,6 @@ void mainloop(GLFWwindow *window) {
       CelestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
-                                     static_cast<float>(bodies[i].mass),
                                      static_cast<float>(bodies[i].event_horizon_radius(app_ptr->simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
                                      bodies[i].is_black_hole ? 1 : 0};
 
@@ -299,7 +295,6 @@ void mainloop(GLFWwindow *window) {
       glUniform1f(uniforms.bodies[i].radius, body_data.radius);
       glUniform3fv(uniforms.bodies[i].color, 1, glm::value_ptr(body_data.color));
       glUniform1i(uniforms.bodies[i].is_black_hole, body_data.is_black_hole);
-      glUniform1f(uniforms.bodies[i].mass, body_data.mass);
       glUniform1f(uniforms.bodies[i].event_horizon, body_data.event_horizon);
     }
 

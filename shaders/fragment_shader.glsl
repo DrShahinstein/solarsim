@@ -17,7 +17,6 @@ struct CelestialBody {
   vec3 position;
   float radius;
   vec3 color;
-  float mass;
   float event_horizon;
   int is_black_hole;
 };
