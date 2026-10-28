@@ -52,6 +52,17 @@ struct ShaderUniforms {
   BodyUniforms bodies[MAX_BODIES];
 };
 
+void report_gl_error(const char *operation) {
+  static bool reported = false;
+  if (reported) return;
+
+  GLenum error = glGetError();
+  if (error != GL_NO_ERROR) {
+    std::cerr << "OpenGL error " << error << " after " << operation << "\n";
+    reported = true;
+  }
+}
+
 ShaderUniforms get_uniform_locations(unsigned int shader_program) {
   ShaderUniforms uniforms{};
 
@@ -98,6 +109,7 @@ void mainloop(GLFWwindow *window) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+  report_gl_error("quad setup");
 
   // initializations
   Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -283,7 +295,7 @@ void mainloop(GLFWwindow *window) {
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
                                      static_cast<float>(bodies[i].mass),
-                                     static_cast<float>(bodies[i].event_horizon_radius(app.simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
+                                     static_cast<float>(bodies[i].event_horizon_radius(app_ptr->simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
                                      bodies[i].is_black_hole ? 1 : 0};
 
       glUniform3fv(uniforms.bodies[i].position, 1, glm::value_ptr(body_data.position));
@@ -296,6 +308,7 @@ void mainloop(GLFWwindow *window) {
 
     glBindVertexArray(quad_VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    report_gl_error("frame render");
 
     if (app_ptr->gui.visible) {
       render_gui(*app_ptr);
