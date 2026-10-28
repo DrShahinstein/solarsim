@@ -141,6 +141,7 @@ void mainloop(GLFWwindow *window) {
 
   // game-loop timing (=> decouples fps from physics updates)
   const double dt = 1.0 / 100;
+  constexpr int MAX_STEPS_PER_FRAME = 2000;
   double current_time = glfwGetTime();
   double accumulator = 0.0;
 
@@ -158,9 +159,8 @@ void mainloop(GLFWwindow *window) {
     if (frame_time > 0.25) {
       frame_time = 0.25;
     }
-    accumulator += frame_time;
-
     AppState *app_ptr = static_cast<AppState *>(glfwGetWindowUserPointer(window));
+    accumulator += frame_time * app_ptr->simulation_speed;
 
     // camera
     glfwPollEvents();
@@ -169,12 +169,17 @@ void mainloop(GLFWwindow *window) {
     }
 
     // physics update
-    while (accumulator >= dt) {
+    int steps = 0;
+    while (accumulator >= dt && steps < MAX_STEPS_PER_FRAME) {
       if (!app_ptr->is_paused) {
-        app_ptr->simulation.update(dt * app_ptr->simulation_speed);
+        app_ptr->simulation.update(dt);
         app_ptr->simulation.remove_marked_bodies(); // erase mass=0 bodies 
       }
       accumulator -= dt;
+      ++steps;
+    }
+    if (steps == MAX_STEPS_PER_FRAME) {
+      accumulator = 0.0;
     }
 
     // rendering
