@@ -6,10 +6,6 @@
 
 Get [meson](https://mesonbuild.com/Getting-meson.html) first.  
 
-GLFW, GLM and Dear ImGui are pinned in [`subprojects/*.wrap`](subprojects)
-and downloaded by Meson on the first build. GLAD is vendored in
-[`vendor/glad`](vendor/glad).
-
 ### Linux
 
 #### => pacman
@@ -46,7 +42,7 @@ $ brew install meson ninja pkg-config
 
 ### Windows
 
-Just make sure you have meson installed and you are building from [w64devkit](https://github.com/skeeto/w64devkit) terminal. That is also what I did in my case for Windows which was easy enough. Have no knowledge about msys2 stuff.  
+Make sure you have meson installed and you are building from [w64devkit](https://github.com/skeeto/w64devkit) terminal. That is also what I did in my case for Windows which was easy enough. Have no knowledge about msys2 stuff.  
 
 ## Build
 
@@ -79,10 +75,7 @@ https://github.com/user-attachments/assets/032a55b1-4358-4ba0-a9fb-3b649fbc8493
 | <kbd>P</kbd>      | Toggle pause/resume simulation            |
 | <kbd>C</kbd>      | Remove last celestial body                |
 
-## Notes
-
-Bodies do not collide; they pass through each other.
-
 ## License
 
 [MIT](LICENSE)
+
