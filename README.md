@@ -58,7 +58,7 @@ $ meson test -C build
 
 ## Black Holes
 
-https://github.com/user-attachments/assets/032a55b1-4358-4ba0-a9fb-3b649fbc8493
+https://github.com/user-attachments/assets/8ab6839f-e4c7-4e40-bde8-d585637cd8b7
 
 <br/>
 
