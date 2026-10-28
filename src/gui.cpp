@@ -143,6 +143,7 @@ void render_gui(AppState &app) {
   }
 
   ImGui::Checkbox("Enable lighting", &app.gui_props.lighting_enabled);
+  ImGui::SliderInt("Ray Steps", &app.gui_props.raymarch_steps, 32, 256);
 
   ImGui::Separator();
   ImGui::Text("Show Windows:");

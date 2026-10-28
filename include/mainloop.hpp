@@ -20,6 +20,7 @@ struct AppState{
     bool show_stats = false;
     bool show_caminfo = false;
     bool lighting_enabled = true;
+    int raymarch_steps = 128;
     struct {
       float mass = 0.1f;
       float radius = 0.1f;

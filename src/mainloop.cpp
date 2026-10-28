@@ -50,6 +50,7 @@ struct ShaderUniforms {
   GLint num_bodies;
   GLint light_index;
   GLint lighting_enabled;
+  GLint raymarch_steps;
   BodyUniforms bodies[MAX_BODIES];
 };
 
@@ -64,6 +65,7 @@ ShaderUniforms get_uniform_locations(unsigned int shader_program) {
   uniforms.num_bodies       = glGetUniformLocation(shader_program, "num_bodies");
   uniforms.light_index      = glGetUniformLocation(shader_program, "light_index");
   uniforms.lighting_enabled = glGetUniformLocation(shader_program, "lighting_enabled");
+  uniforms.raymarch_steps   = glGetUniformLocation(shader_program, "raymarch_steps");
 
   for (int i = 0; i < MAX_BODIES; i++) {
     std::string index = "bodies[" + std::to_string(i) + "]";
@@ -275,6 +277,7 @@ void mainloop(GLFWwindow *window) {
     glUniform1f(uniforms.aspect_ratio, aspect_ratio);
     glUniform1i(uniforms.num_bodies, static_cast<int>(std::min(bodies.size(), static_cast<size_t>(MAX_BODIES))));
     glUniform1i(uniforms.lighting_enabled, app_ptr->gui_props.lighting_enabled);
+    glUniform1i(uniforms.raymarch_steps, app_ptr->gui_props.raymarch_steps);
 
     int light_index = -1;
     for (size_t i = 0; i < bodies.size(); i++) {

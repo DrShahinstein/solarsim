@@ -11,6 +11,7 @@ uniform float aspect_ratio;
 uniform int num_bodies;
 uniform int light_index;
 uniform bool lighting_enabled;
+uniform int raymarch_steps;
 
 struct CelestialBody {
   vec3 position;
@@ -23,7 +24,7 @@ struct CelestialBody {
 
 uniform CelestialBody bodies[MAX_BODIES];
 
-const int MAX_STEPS = 128;
+const int MAX_STEPS = 256;
 const float MAX_DIST = 200.0;
 const float SURF_DIST = 0.001;
 
@@ -141,6 +142,7 @@ void main() {
 Hit ray_march(vec3 ro, vec3 rd) {
   float total_dist = 0.0;
   for (int i = 0; i < MAX_STEPS; i++) {
+    if (i >= raymarch_steps) break;
     vec3 p = ro + total_dist * rd;
     float dist = scene_distance(p);
     if (dist < SURF_DIST) {
