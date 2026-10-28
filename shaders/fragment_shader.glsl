@@ -88,7 +88,7 @@ void main() {
         vec3 deflection_axis = normalize(cross(ray_dir, p));
 
         // rotate ray_dir around the deflection axis using Rodrigues' rotation formula
-        ray_dir = mix(ray_dir, cross(deflection_axis, ray_dir), sin(alpha)) + ray_dir * (cos(alpha) - 1.0) * 0.5;
+        ray_dir = ray_dir * cos(alpha) + cross(deflection_axis, ray_dir) * sin(alpha);
         ray_dir = normalize(ray_dir);
       }
     }
