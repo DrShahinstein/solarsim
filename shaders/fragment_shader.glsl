@@ -102,7 +102,7 @@ void main() {
     bool disk_hit = false;
     for (int i = 0; i < num_bodies; i++) {
       if (bodies[i].is_black_hole == 1) {
-        vec3 disk_normal = normalize(cross(bodies[i].position, vec3(0, 1, 0.5)));
+        vec3 disk_normal = normalize(vec3(0.0, 1.0, 0.5));
         float disk_radius = bodies[i].event_horizon * 10.0;
         float event_horizon_radius = bodies[i].event_horizon;
 
@@ -201,9 +201,9 @@ vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos) {
                 pow(t, 1.5));
   }
 
-  color *= (0.7 + 0.3 * noise) * pow(1.0 - r, 0.5);
+  color *= (0.7 + 0.3 * noise) * pow(max(1.0 - r, 0.0), 0.5);
 
-  vec3 disk_normal = normalize(cross(p, vec3(0, 1, 0)));
+  vec3 disk_normal = normalize(vec3(0.0, 1.0, 0.5));
   float doppler = 1.0 + 0.5 * dot(normalize(p), disk_normal);
   color.rgb *= mix(1.0, doppler, 0.8);
 
