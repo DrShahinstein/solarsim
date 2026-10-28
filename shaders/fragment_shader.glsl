@@ -18,6 +18,7 @@ struct CelestialBody {
   float radius;
   vec3 color;
   float mass;
+  float event_horizon;
   int is_black_hole;
 };
 
@@ -65,7 +66,7 @@ void main() {
   // 2. APPLY GRAVITATIONAL LENSING
   for (int i = 0; i < num_bodies; i++) {
     if (bodies[i].is_black_hole == 1) {
-      float rs = bodies[i].radius * 0.5;
+      float rs = bodies[i].event_horizon;
 
       vec3 p = bodies[i].position - ray_origin;
       float d = dot(p, ray_dir);
@@ -102,8 +103,8 @@ void main() {
     for (int i = 0; i < num_bodies; i++) {
       if (bodies[i].is_black_hole == 1) {
         vec3 disk_normal = normalize(cross(bodies[i].position, vec3(0, 1, 0.5)));
-        float disk_radius = bodies[i].radius * 5.0;
-        float event_horizon_radius = bodies[i].radius * 0.5;
+        float disk_radius = bodies[i].event_horizon * 10.0;
+        float event_horizon_radius = bodies[i].event_horizon;
 
         float denom = dot(ray_dir, disk_normal);
         if (abs(denom) > 0.001) { // ray is not parallel to disk

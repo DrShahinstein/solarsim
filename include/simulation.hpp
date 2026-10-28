@@ -8,6 +8,7 @@
 #define DEFAULT_G 0.000295912208
 
 constexpr int MAX_BODIES = 20;
+constexpr double BLACK_HOLE_VISUAL_SCALE = 2.5e7;
 
 struct CelestialBody {
   glm::dvec3 position{0.0};
@@ -20,6 +21,10 @@ struct CelestialBody {
   bool is_star = false;
   bool marked_for_deletion = false;
   glm::dvec3 previous_acceleration{0.0};
+
+  double event_horizon_radius(double gravity) const {
+    return is_black_hole ? (2.0 * gravity * mass) / (C * C) : 0.0;
+  }
 };
 
 class Simulation;

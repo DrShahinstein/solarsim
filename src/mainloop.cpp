@@ -28,6 +28,7 @@ struct CalestialBodyData {
   glm::vec3 color;
   float radius;
   float mass;
+  float event_horizon;
   int is_black_hole;
 };
 
@@ -244,7 +245,8 @@ void mainloop(GLFWwindow *window) {
       CalestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
-                                     static_cast<float>(bodies[i].mass), 
+                                     static_cast<float>(bodies[i].mass),
+                                     static_cast<float>(bodies[i].event_horizon_radius(app.simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
                                      bodies[i].is_black_hole ? 1 : 0};
 
       glUniform3fv(glGetUniformLocation(shader_program, (index + ".position").c_str()), 1, glm::value_ptr(body_data.position));
@@ -252,6 +254,7 @@ void mainloop(GLFWwindow *window) {
       glUniform3fv(glGetUniformLocation(shader_program, (index + ".color").c_str()), 1, glm::value_ptr(body_data.color));
       glUniform1i(glGetUniformLocation(shader_program, (index + ".is_black_hole").c_str()), body_data.is_black_hole);
       glUniform1f(glGetUniformLocation(shader_program, (index + ".mass").c_str()), body_data.mass);
+      glUniform1f(glGetUniformLocation(shader_program, (index + ".event_horizon").c_str()), body_data.event_horizon);
     }
 
     glBindVertexArray(quad_VAO);

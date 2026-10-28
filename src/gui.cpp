@@ -39,10 +39,12 @@ void render_body_editor(CelestialBody &body, int index) {
       body.mass = static_cast<double>(mass);
     }
 
+    ImGui::BeginDisabled(body.is_black_hole);
     float radius = static_cast<float>(body.radius);
     if (ImGui::SliderFloat("Radius", &radius, 0.01f, 2.0f)) {
       body.radius = static_cast<double>(radius);
     }
+    ImGui::EndDisabled();
 
     ImGui::InputScalarN("Position", ImGuiDataType_Double, &body.position.x, 3, nullptr, nullptr, "%.6f");
     ImGui::InputScalarN("Velocity", ImGuiDataType_Double, &body.velocity.x, 3, nullptr, nullptr, "%.6f");
@@ -174,9 +176,11 @@ void render_gui(AppState &app) {
     if (ImGui::SliderFloat("Mass", &app.gui_props.body_editor.mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
       new_body.mass = app.gui_props.body_editor.mass;
     }
+    ImGui::BeginDisabled(app.gui_props.body_editor.is_black_hole);
     if (ImGui::SliderFloat("Radius", &app.gui_props.body_editor.radius, 0.01f, 2.0f)) {
       new_body.radius = app.gui_props.body_editor.radius;
     }
+    ImGui::EndDisabled();
     if (ImGui::ColorEdit3("Color", &app.gui_props.body_editor.color[0])) {
       new_body.color = app.gui_props.body_editor.color;
     }
