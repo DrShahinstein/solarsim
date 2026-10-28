@@ -37,6 +37,7 @@ public:
 private:
   void compute_forces();
   void apply_post_newtonian_corrections();
+  void recompute_accelerations();
   void integrate_velocity_verlet(double dt);
   Integrator current_integrator;
   double G;

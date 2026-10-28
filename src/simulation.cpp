@@ -5,15 +5,14 @@
 #include "simulation.hpp"
 
 Simulation::Simulation() : G(DEFAULT_G)              { current_integrator = &Simulation::integrate_velocity_verlet; }
-void Simulation::add_body(const CelestialBody &body) { bodies.push_back(body); }
+void Simulation::add_body(const CelestialBody &body) { bodies.push_back(body); recompute_accelerations(); }
 void Simulation::clear_bodies()                      { bodies.clear(); }
-void Simulation::setG(double value)                  { G = value; }
+void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
 double Simulation::getG()                      const { return G; }
 std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
 
 void Simulation::compute_forces() {
   for (auto &body : bodies) {
-    body.previous_acceleration = body.acceleration;
     body.acceleration = glm::dvec3(0.0);
   }
 
@@ -70,6 +69,11 @@ void Simulation::apply_post_newtonian_corrections() {
   }
 }
 
+void Simulation::recompute_accelerations() {
+  compute_forces();
+  apply_post_newtonian_corrections();
+}
+
 void Simulation::update(double dt) {
   (this->*current_integrator)(dt);
 }
@@ -84,10 +88,10 @@ void Simulation::remove_marked_bodies() {
 void Simulation::integrate_velocity_verlet(double dt) {
   for (auto &body : bodies) {
     body.position += body.velocity * dt + 0.5 * body.acceleration * (dt * dt);
+    body.previous_acceleration = body.acceleration;
   }
 
-  compute_forces();
-  apply_post_newtonian_corrections();
+  recompute_accelerations();
 
   for (auto &body : bodies) {
     body.velocity += 0.5 * (body.previous_acceleration + body.acceleration) * dt;
