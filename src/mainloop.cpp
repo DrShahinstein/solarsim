@@ -114,10 +114,8 @@ void mainloop(GLFWwindow *window) {
   // initializations
   Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
   initialize_imgui(window);
-  Simulation simulation;
-  simulation.reset_to_solar_system();
   AppState app{};
-  app.simulation = simulation;
+  app.simulation.reset_to_solar_system();
   app.camera = &camera;
   glfwSetWindowUserPointer(window, &app);
 
