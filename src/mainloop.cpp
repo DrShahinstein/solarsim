@@ -32,9 +32,56 @@ struct CalestialBodyData {
   int is_black_hole;
 };
 
+struct BodyUniforms {
+  GLint position;
+  GLint radius;
+  GLint color;
+  GLint mass;
+  GLint event_horizon;
+  GLint is_black_hole;
+};
+
+struct ShaderUniforms {
+  GLint camera_pos;
+  GLint camera_front;
+  GLint camera_up;
+  GLint camera_right;
+  GLint aspect_ratio;
+  GLint num_bodies;
+  GLint light_index;
+  GLint lighting_enabled;
+  BodyUniforms bodies[MAX_BODIES];
+};
+
+ShaderUniforms get_uniform_locations(unsigned int shader_program) {
+  ShaderUniforms uniforms{};
+
+  uniforms.camera_pos       = glGetUniformLocation(shader_program, "camera_pos");
+  uniforms.camera_front     = glGetUniformLocation(shader_program, "camera_front");
+  uniforms.camera_up        = glGetUniformLocation(shader_program, "camera_up");
+  uniforms.camera_right     = glGetUniformLocation(shader_program, "camera_right");
+  uniforms.aspect_ratio     = glGetUniformLocation(shader_program, "aspect_ratio");
+  uniforms.num_bodies       = glGetUniformLocation(shader_program, "num_bodies");
+  uniforms.light_index      = glGetUniformLocation(shader_program, "light_index");
+  uniforms.lighting_enabled = glGetUniformLocation(shader_program, "lighting_enabled");
+
+  for (int i = 0; i < MAX_BODIES; i++) {
+    std::string index = "bodies[" + std::to_string(i) + "]";
+    uniforms.bodies[i].position       = glGetUniformLocation(shader_program, (index + ".position").c_str());
+    uniforms.bodies[i].radius         = glGetUniformLocation(shader_program, (index + ".radius").c_str());
+    uniforms.bodies[i].color          = glGetUniformLocation(shader_program, (index + ".color").c_str());
+    uniforms.bodies[i].mass           = glGetUniformLocation(shader_program, (index + ".mass").c_str());
+    uniforms.bodies[i].event_horizon  = glGetUniformLocation(shader_program, (index + ".event_horizon").c_str());
+    uniforms.bodies[i].is_black_hole  = glGetUniformLocation(shader_program, (index + ".is_black_hole").c_str());
+  }
+
+  return uniforms;
+}
+
 void mainloop(GLFWwindow *window) {
   // shaders
   auto shader_program = create_shader_program();
+  ShaderUniforms uniforms = get_uniform_locations(shader_program);
 
   // fs quad setup
   float quad_vertices[] = {-1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f,
@@ -221,13 +268,13 @@ void mainloop(GLFWwindow *window) {
     glViewport(0, 0, framebuffer_width, framebuffer_height);
 
     glUseProgram(shader_program);
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_pos"), 1, glm::value_ptr(app_ptr->camera->m_position));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_front"), 1, glm::value_ptr(app_ptr->camera->m_front));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_up"), 1, glm::value_ptr(app_ptr->camera->m_up));
-    glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(app_ptr->camera->m_right));
-    glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-    glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), static_cast<int>(std::min(bodies.size(), static_cast<size_t>(MAX_BODIES))));
-    glUniform1i(glGetUniformLocation(shader_program, "lighting_enabled"), app_ptr->gui_props.lighting_enabled);
+    glUniform3fv(uniforms.camera_pos, 1, glm::value_ptr(app_ptr->camera->m_position));
+    glUniform3fv(uniforms.camera_front, 1, glm::value_ptr(app_ptr->camera->m_front));
+    glUniform3fv(uniforms.camera_up, 1, glm::value_ptr(app_ptr->camera->m_up));
+    glUniform3fv(uniforms.camera_right, 1, glm::value_ptr(app_ptr->camera->m_right));
+    glUniform1f(uniforms.aspect_ratio, aspect_ratio);
+    glUniform1i(uniforms.num_bodies, static_cast<int>(std::min(bodies.size(), static_cast<size_t>(MAX_BODIES))));
+    glUniform1i(uniforms.lighting_enabled, app_ptr->gui_props.lighting_enabled);
 
     int light_index = -1;
     for (size_t i = 0; i < bodies.size(); i++) {
@@ -236,11 +283,9 @@ void mainloop(GLFWwindow *window) {
         break;
       }
     }
-    glUniform1i(glGetUniformLocation(shader_program, "light_index"), light_index);
+    glUniform1i(uniforms.light_index, light_index);
 
     for (size_t i = 0; i < bodies.size() && i < MAX_BODIES; i++) {
-      std::string index = "bodies[" + std::to_string(i) + "]";
-
       CalestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
@@ -248,12 +293,12 @@ void mainloop(GLFWwindow *window) {
                                      static_cast<float>(bodies[i].event_horizon_radius(app.simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
                                      bodies[i].is_black_hole ? 1 : 0};
 
-      glUniform3fv(glGetUniformLocation(shader_program, (index + ".position").c_str()), 1, glm::value_ptr(body_data.position));
-      glUniform1f(glGetUniformLocation(shader_program, (index + ".radius").c_str()), body_data.radius);
-      glUniform3fv(glGetUniformLocation(shader_program, (index + ".color").c_str()), 1, glm::value_ptr(body_data.color));
-      glUniform1i(glGetUniformLocation(shader_program, (index + ".is_black_hole").c_str()), body_data.is_black_hole);
-      glUniform1f(glGetUniformLocation(shader_program, (index + ".mass").c_str()), body_data.mass);
-      glUniform1f(glGetUniformLocation(shader_program, (index + ".event_horizon").c_str()), body_data.event_horizon);
+      glUniform3fv(uniforms.bodies[i].position, 1, glm::value_ptr(body_data.position));
+      glUniform1f(uniforms.bodies[i].radius, body_data.radius);
+      glUniform3fv(uniforms.bodies[i].color, 1, glm::value_ptr(body_data.color));
+      glUniform1i(uniforms.bodies[i].is_black_hole, body_data.is_black_hole);
+      glUniform1f(uniforms.bodies[i].mass, body_data.mass);
+      glUniform1f(uniforms.bodies[i].event_horizon, body_data.event_horizon);
     }
 
     glBindVertexArray(quad_VAO);
