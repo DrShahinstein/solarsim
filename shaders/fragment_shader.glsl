@@ -11,7 +11,6 @@ uniform float aspect_ratio;
 uniform int num_bodies;
 uniform int light_index;
 uniform bool lighting_enabled;
-uniform float G;
 
 struct CelestialBody {
   vec3 position;
@@ -27,9 +26,6 @@ uniform CelestialBody bodies[MAX_BODIES];
 const int MAX_STEPS = 128;
 const float MAX_DIST = 200.0;
 const float SURF_DIST = 0.001;
-const float C = 173.1446; // speed of light in AU/day
-const float C_SQ = C * C;
-const float PI = 3.14159265359;
 
 struct Hit {
   vec3 color;

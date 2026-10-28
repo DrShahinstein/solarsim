@@ -237,7 +237,6 @@ void mainloop(GLFWwindow *window) {
       }
     }
     glUniform1i(glGetUniformLocation(shader_program, "light_index"), light_index);
-    glUniform1f(glGetUniformLocation(shader_program, "G"), static_cast<float>(app.simulation.getG()));
 
     for (size_t i = 0; i < bodies.size() && i < MAX_BODIES; i++) {
       std::string index = "bodies[" + std::to_string(i) + "]";
