@@ -1,5 +1,6 @@
 project('solarsim', ['cpp', 'c'],
   version : '0.1.0',
+  meson_version : '>=0.60.0',
   default_options : [
     'cpp_std=c++20',
     'c_std=c17',
@@ -58,11 +59,20 @@ glad_sources = files('vendor/glad/src/glad.c')
 
 program_install_subdir = 'dist'
 
-executable('solarsim',
-  app_sources,
+glad_c_args = meson.get_compiler('c').get_supported_arguments('-Wno-pedantic')
+
+glad_lib = static_library('glad',
   glad_sources,
   include_directories : inc,
+  c_args               : glad_c_args,
+  override_options     : ['warning_level=0'],
+)
+
+executable('solarsim',
+  app_sources,
+  include_directories : inc,
   dependencies        : [opengl_dep, glfw_dep, glm_dep, imgui_dep],
+  link_with           : glad_lib,
   link_args           : is_windows ? ['-mwindows'] : [],
   install             : true,
   install_dir         : program_install_subdir
