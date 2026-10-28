@@ -5,8 +5,6 @@
 #include "simulation.hpp"
 #include "camera.hpp"
 
-#define MAX_BODIES 20
-
 struct AppState{
   Simulation simulation;
   Camera *camera;

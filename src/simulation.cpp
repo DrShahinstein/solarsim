@@ -5,7 +5,11 @@
 #include "simulation.hpp"
 
 Simulation::Simulation() : G(DEFAULT_G)              { current_integrator = &Simulation::integrate_velocity_verlet; }
-void Simulation::add_body(const CelestialBody &body) { bodies.push_back(body); recompute_accelerations(); }
+void Simulation::add_body(const CelestialBody &body) {
+  if (bodies.size() >= MAX_BODIES) return;
+  bodies.push_back(body);
+  recompute_accelerations();
+}
 void Simulation::clear_bodies()                      { bodies.clear(); }
 void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
 double Simulation::getG()                      const { return G; }

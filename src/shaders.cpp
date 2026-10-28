@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "shaders.hpp"
+#include "simulation.hpp"
 
 #define VERTEX_SHADER   "shaders/vertex_shader.glsl"
 #define FRAGMENT_SHADER "shaders/fragment_shader.glsl"
@@ -20,9 +21,17 @@ std::string load_shader(const char *shader_path) {
   return shader_stream.str();
 }
 
+std::string inject_constants(std::string source) {
+  const std::string defines = "\n#define MAX_BODIES " + std::to_string(MAX_BODIES);
+  const size_t version_end = source.find('\n');
+  if (version_end == std::string::npos) return source;
+  source.insert(version_end, defines);
+  return source;
+}
+
 unsigned int create_shader_program() {
   std::string vertex_shader_str   = load_shader(VERTEX_SHADER);
-  std::string fragment_shader_str = load_shader(FRAGMENT_SHADER);
+  std::string fragment_shader_str = inject_constants(load_shader(FRAGMENT_SHADER));
   const char *vertex_shader_src   = vertex_shader_str.c_str();
   const char *fragment_shader_src = fragment_shader_str.c_str();
 

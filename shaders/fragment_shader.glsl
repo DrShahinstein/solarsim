@@ -21,7 +21,6 @@ struct CelestialBody {
   int is_black_hole;
 };
 
-const int MAX_BODIES = 20;
 uniform CelestialBody bodies[MAX_BODIES];
 
 const int MAX_STEPS = 128;

@@ -7,6 +7,8 @@
 #define C 173.1446
 #define DEFAULT_G 0.000295912208
 
+constexpr int MAX_BODIES = 20;
+
 struct CelestialBody {
   glm::dvec3 position{0.0};
   glm::dvec3 velocity{0.0};

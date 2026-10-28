@@ -7,6 +7,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <chrono>
+#include <algorithm>
 #include <thread>
 #include <iostream>
 #include "mainloop.hpp"
@@ -224,7 +225,7 @@ void mainloop(GLFWwindow *window) {
     glUniform3fv(glGetUniformLocation(shader_program, "camera_up"), 1, glm::value_ptr(app_ptr->camera->m_up));
     glUniform3fv(glGetUniformLocation(shader_program, "camera_right"), 1, glm::value_ptr(app_ptr->camera->m_right));
     glUniform1f(glGetUniformLocation(shader_program, "aspect_ratio"), aspect_ratio);
-    glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), bodies.size());
+    glUniform1i(glGetUniformLocation(shader_program, "num_bodies"), static_cast<int>(std::min(bodies.size(), static_cast<size_t>(MAX_BODIES))));
     glUniform1i(glGetUniformLocation(shader_program, "lighting_enabled"), app_ptr->gui_props.lighting_enabled);
 
     int light_index = -1;
