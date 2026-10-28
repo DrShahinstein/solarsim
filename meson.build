@@ -83,3 +83,12 @@ install_subdir(
   install_dir : program_install_subdir,
 )
 
+physics_test = executable('physics_test',
+  'tests/physics_test.cpp',
+  'src/simulation.cpp',
+  include_directories : inc,
+  dependencies        : [glm_dep],
+)
+
+test('physics', physics_test)
+
