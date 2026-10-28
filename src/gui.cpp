@@ -64,7 +64,7 @@ void render_simulation_stats(AppState &app, double frame_time) {
   ImGui::Begin("Performance Stats");
 
   ImGui::Text("Frame Time: %.3f ms (%.1f FPS)", frame_time * 1000.0, 1.0 / frame_time);
-  ImGui::Text("Physics Steps: %zu", app.simulation.get_bodies().size() * app.simulation.get_bodies().size());
+  ImGui::Text("Physics Steps: %llu", static_cast<unsigned long long>(app.simulation.get_physics_steps()));
 
   size_t body_size = app.simulation.get_bodies().size() * sizeof(CelestialBody);
   ImGui::Text("Memory: %.2f KB", body_size / 1024.0f);
@@ -75,7 +75,7 @@ void render_simulation_stats(AppState &app, double frame_time) {
 
   ImGui::Separator();
   ImGui::Text("Integrator: Velocity Verlet");
-  ImGui::Text("Time Step: %.4f s", 1.0 / 100 * app.simulation_speed);
+  ImGui::Text("Time Step: %.4f days", 1.0 / 100);
 
   ImGui::End();
 }

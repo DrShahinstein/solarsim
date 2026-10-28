@@ -13,6 +13,7 @@ void Simulation::add_body(const CelestialBody &body) {
 void Simulation::clear_bodies()                      { bodies.clear(); }
 void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
 double Simulation::getG()                      const { return G; }
+uint64_t Simulation::get_physics_steps()       const { return physics_steps; }
 std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
 const std::vector<CelestialBody> &Simulation::get_bodies() const { return bodies; }
 
@@ -81,6 +82,7 @@ void Simulation::recompute_accelerations() {
 
 void Simulation::update(double dt) {
   integrate_velocity_verlet(dt);
+  ++physics_steps;
 }
 
 void Simulation::remove_marked_bodies() {
@@ -106,6 +108,7 @@ void Simulation::integrate_velocity_verlet(double dt) {
 void Simulation::reset_to_solar_system() {
   clear_bodies();
   G = DEFAULT_G;
+  physics_steps = 0;
 
   constexpr double sun_mass = 1.0;
   glm::dvec3 sun_velocity(0.0);

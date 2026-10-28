@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <cstdint>
 #include <vector>
 
 constexpr double C = 173.1446;
@@ -33,6 +34,7 @@ public:
   void clear_bodies();
   void setG(double value);
   double getG() const;
+  uint64_t get_physics_steps() const;
   std::vector<CelestialBody> &get_bodies();
   const std::vector<CelestialBody> &get_bodies() const;
   void update(double dt);
@@ -45,5 +47,6 @@ private:
   void recompute_accelerations();
   void integrate_velocity_verlet(double dt);
   std::vector<CelestialBody> bodies;
+  uint64_t physics_steps = 0;
   double G;
 };
