@@ -100,15 +100,7 @@ void mainloop(GLFWwindow *window) {
   initialize_imgui(window);
   Simulation simulation;
   simulation.reset_to_solar_system();
-  AppState app{.simulation = simulation,
-               .camera = &camera,
-               .is_mouse_captured = true,
-               .is_paused = false,
-               .gui_visible = false,
-               .simulation_speed = 1.0f,
-               .lastX = SCREEN_WIDTH / 2.0,
-               .lastY = SCREEN_HEIGHT / 2.0,
-               .first_mouse = true};
+  AppState app{.simulation = simulation, .camera = &camera, .simulation_speed = 1.0f};
   glfwSetWindowUserPointer(window, &app);
 
   // input callbacks
@@ -119,17 +111,17 @@ void mainloop(GLFWwindow *window) {
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-      if (app->is_mouse_captured) {
-        glfwGetCursorPos(window, &app->lastX, &app->lastY);
-        app->is_mouse_captured = false;
-        app->gui_visible = true;
+      if (app->input.mouse_captured) {
+        glfwGetCursorPos(window, &app->input.last_x, &app->input.last_y);
+        app->input.mouse_captured = false;
+        app->gui.visible = true;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         ImGui::GetIO().MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
       } else {
-        app->is_mouse_captured = true;
-        app->gui_visible = false;
+        app->input.mouse_captured = true;
+        app->gui.visible = false;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        app->first_mouse = true;
+        app->input.first_mouse = true;
       }
       return;
     }
@@ -138,7 +130,7 @@ void mainloop(GLFWwindow *window) {
       return;
     }
 
-    if (action == GLFW_PRESS && app->is_mouse_captured) {
+    if (action == GLFW_PRESS && app->input.mouse_captured) {
       switch (key) {
       case GLFW_KEY_R:
         app->simulation.reset_to_solar_system();
@@ -148,16 +140,16 @@ void mainloop(GLFWwindow *window) {
         CelestialBody new_body{};
         new_body.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
         new_body.velocity = glm::dvec3(0.0);
-        new_body.mass = app->gui_props.body_editor.mass;
-        new_body.radius = app->gui_props.body_editor.radius;
-        new_body.color = app->gui_props.body_editor.color;
-        new_body.is_black_hole = app->gui_props.body_editor.is_black_hole;
-        new_body.is_star = app->gui_props.body_editor.is_star;
+        new_body.mass = app->gui.body_editor.mass;
+        new_body.radius = app->gui.body_editor.radius;
+        new_body.color = app->gui.body_editor.color;
+        new_body.is_black_hole = app->gui.body_editor.is_black_hole;
+        new_body.is_star = app->gui.body_editor.is_star;
         app->simulation.add_body(new_body);
         break;
       }
       case GLFW_KEY_P:
-        app->is_paused = !app->is_paused;
+        app->paused = !app->paused;
         break;
       case GLFW_KEY_C:
         if (!app->simulation.get_bodies().empty()) {
@@ -171,16 +163,16 @@ void mainloop(GLFWwindow *window) {
   glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos) {
     AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
     ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
-    if (app->is_mouse_captured) {
-      if (app->first_mouse) {
-        app->lastX = xpos;
-        app->lastY = ypos;
-        app->first_mouse = false;
+    if (app->input.mouse_captured) {
+      if (app->input.first_mouse) {
+        app->input.last_x = xpos;
+        app->input.last_y = ypos;
+        app->input.first_mouse = false;
       }
-      float xoffset = xpos - app->lastX;
-      float yoffset = app->lastY - ypos;
-      app->lastX = xpos;
-      app->lastY = ypos;
+      float xoffset = xpos - app->input.last_x;
+      float yoffset = app->input.last_y - ypos;
+      app->input.last_x = xpos;
+      app->input.last_y = ypos;
       app->camera->process_mouse_movement(xoffset, yoffset);
     }
   });
@@ -229,14 +221,14 @@ void mainloop(GLFWwindow *window) {
 
     // camera
     glfwPollEvents();
-    if (app_ptr->is_mouse_captured) {
+    if (app_ptr->input.mouse_captured) {
       process_input(window, *app_ptr->camera, static_cast<float>(frame_time), &app);
     }
 
     // physics update
     int steps = 0;
     while (accumulator >= dt && steps < MAX_STEPS_PER_FRAME) {
-      if (!app_ptr->is_paused) {
+      if (!app_ptr->paused) {
         app_ptr->simulation.update(dt);
         app_ptr->simulation.remove_marked_bodies();
       }
@@ -270,8 +262,8 @@ void mainloop(GLFWwindow *window) {
     glUniform3fv(uniforms.camera_right, 1, glm::value_ptr(app_ptr->camera->m_right));
     glUniform1f(uniforms.aspect_ratio, aspect_ratio);
     glUniform1i(uniforms.num_bodies, static_cast<int>(std::min(bodies.size(), static_cast<size_t>(MAX_BODIES))));
-    glUniform1i(uniforms.lighting_enabled, app_ptr->gui_props.lighting_enabled);
-    glUniform1i(uniforms.raymarch_steps, app_ptr->gui_props.raymarch_steps);
+    glUniform1i(uniforms.lighting_enabled, app_ptr->gui.lighting_enabled);
+    glUniform1i(uniforms.raymarch_steps, app_ptr->gui.raymarch_steps);
 
     int light_index = -1;
     for (size_t i = 0; i < bodies.size(); i++) {
@@ -301,7 +293,7 @@ void mainloop(GLFWwindow *window) {
     glBindVertexArray(quad_VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    if (app_ptr->gui_visible) {
+    if (app_ptr->gui.visible) {
       render_gui(*app_ptr);
     } else {
       ImGui::Render();

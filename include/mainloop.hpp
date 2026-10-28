@@ -2,33 +2,40 @@
 #define MAINLOOP_HPP
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include "simulation.hpp"
 #include "camera.hpp"
 
-struct AppState{
-  Simulation simulation;
-  Camera *camera;
-  bool is_mouse_captured;
-  bool is_paused;
-  bool gui_visible;
-  float simulation_speed=1.0f;
-  double lastX;
-  double lastY;
-  bool first_mouse;
+struct InputState {
+  bool mouse_captured = true;
+  double last_x = 0.0;
+  double last_y = 0.0;
+  bool first_mouse = true;
+};
+
+struct GuiState {
+  bool visible = false;
+  bool show_help = false;
+  bool show_stats = false;
+  bool show_camera_info = false;
+  bool lighting_enabled = true;
+  int raymarch_steps = 128;
   struct {
-    bool show_help = false;
-    bool show_stats = false;
-    bool show_caminfo = false;
-    bool lighting_enabled = true;
-    int raymarch_steps = 128;
-    struct {
-      float mass = 0.1f;
-      float radius = 0.1f;
-      glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
-      bool is_black_hole = false;
-      bool is_star = false;
-    } body_editor;
-  } gui_props{};
+    float mass = 0.1f;
+    float radius = 0.1f;
+    glm::vec3 color = glm::vec3(1.0f, 0.0f, 0.0f);
+    bool is_black_hole = false;
+    bool is_star = false;
+  } body_editor;
+};
+
+struct AppState {
+  Simulation simulation;
+  Camera *camera = nullptr;
+  bool paused = false;
+  float simulation_speed = 1.0f;
+  InputState input;
+  GuiState gui;
 };
 
 void mainloop(GLFWwindow *window);

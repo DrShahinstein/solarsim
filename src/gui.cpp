@@ -128,7 +128,7 @@ void render_gui(AppState &app) {
   ImGui::SetNextWindowSize(ImVec2(UI_WIDTH, 0), ImGuiCond_FirstUseEver);
   ImGui::Begin("Simulation Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-  ImGui::Checkbox("Pause Simulation", &app.is_paused);
+  ImGui::Checkbox("Pause Simulation", &app.paused);
   ImGui::SameLine();
   if (ImGui::Button("Reset")) {
     app.simulation.reset_to_solar_system();
@@ -141,17 +141,17 @@ void render_gui(AppState &app) {
     app.simulation.setG(static_cast<double>(G));
   }
 
-  ImGui::Checkbox("Enable lighting", &app.gui_props.lighting_enabled);
-  ImGui::SliderInt("Ray Steps", &app.gui_props.raymarch_steps, 32, 256);
+  ImGui::Checkbox("Enable lighting", &app.gui.lighting_enabled);
+  ImGui::SliderInt("Ray Steps", &app.gui.raymarch_steps, 32, 256);
 
   ImGui::Separator();
   ImGui::Text("Show Windows:");
   ImGui::SameLine();
-  ImGui::Checkbox("Performance", &app.gui_props.show_stats);
+  ImGui::Checkbox("Performance", &app.gui.show_stats);
   ImGui::SameLine();
-  ImGui::Checkbox("Help", &app.gui_props.show_help);
+  ImGui::Checkbox("Help", &app.gui.show_help);
   ImGui::SameLine();
-  ImGui::Checkbox("Camera", &app.gui_props.show_caminfo);
+  ImGui::Checkbox("Camera", &app.gui.show_camera_info);
 
   ImGui::Separator();
   if (ImGui::CollapsingHeader("Celestial Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -165,46 +165,46 @@ void render_gui(AppState &app) {
 
   if (ImGui::CollapsingHeader("Add Body") && app.simulation.get_bodies().size() < MAX_BODIES) {
     static CelestialBody new_body{};
-    new_body.mass          = app.gui_props.body_editor.mass;
-    new_body.radius        = app.gui_props.body_editor.radius;
-    new_body.color         = app.gui_props.body_editor.color;
-    new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
-    new_body.is_star       = app.gui_props.body_editor.is_star;
+    new_body.mass          = app.gui.body_editor.mass;
+    new_body.radius        = app.gui.body_editor.radius;
+    new_body.color         = app.gui.body_editor.color;
+    new_body.is_black_hole = app.gui.body_editor.is_black_hole;
+    new_body.is_star       = app.gui.body_editor.is_star;
     new_body.position      = app.camera->m_position + app.camera->m_front * 1.0f;
     new_body.velocity      = glm::dvec3(0.0, 0.0, 0.0);
 
-    if (ImGui::SliderFloat("Mass", &app.gui_props.body_editor.mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
-      new_body.mass = app.gui_props.body_editor.mass;
+    if (ImGui::SliderFloat("Mass", &app.gui.body_editor.mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
+      new_body.mass = app.gui.body_editor.mass;
     }
-    ImGui::BeginDisabled(app.gui_props.body_editor.is_black_hole);
-    if (ImGui::SliderFloat("Radius", &app.gui_props.body_editor.radius, 0.01f, 2.0f)) {
-      new_body.radius = app.gui_props.body_editor.radius;
+    ImGui::BeginDisabled(app.gui.body_editor.is_black_hole);
+    if (ImGui::SliderFloat("Radius", &app.gui.body_editor.radius, 0.01f, 2.0f)) {
+      new_body.radius = app.gui.body_editor.radius;
     }
     ImGui::EndDisabled();
-    if (ImGui::ColorEdit3("Color", &app.gui_props.body_editor.color[0])) {
-      new_body.color = app.gui_props.body_editor.color;
+    if (ImGui::ColorEdit3("Color", &app.gui.body_editor.color[0])) {
+      new_body.color = app.gui.body_editor.color;
     }
 
-    ImGui::Checkbox("Black Hole", &app.gui_props.body_editor.is_black_hole);
-    new_body.is_black_hole = app.gui_props.body_editor.is_black_hole;
+    ImGui::Checkbox("Black Hole", &app.gui.body_editor.is_black_hole);
+    new_body.is_black_hole = app.gui.body_editor.is_black_hole;
 
-    ImGui::Checkbox("Star", &app.gui_props.body_editor.is_star);
-    new_body.is_star = app.gui_props.body_editor.is_star;
+    ImGui::Checkbox("Star", &app.gui.body_editor.is_star);
+    new_body.is_star = app.gui.body_editor.is_star;
 
     if (ImGui::Button("Add")) {
       app.simulation.add_body(new_body);
     }
   }
 
-  if (app.gui_props.show_stats) {
+  if (app.gui.show_stats) {
     render_simulation_stats(app, calc_frame_time());
   }
 
-  if (app.gui_props.show_help) {
+  if (app.gui.show_help) {
     render_help_window();
   }
 
-  if (app.gui_props.show_caminfo) {
+  if (app.gui.show_camera_info) {
     render_camera_info(*app.camera);
   }
 
