@@ -67,8 +67,9 @@ void mainloop(GLFWwindow *window) {
     AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
     ImGuiIO &io = ImGui::GetIO();
 
+    ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+
     if (io.WantCaptureKeyboard) {
-      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
       return;
     }
 
@@ -118,6 +119,7 @@ void mainloop(GLFWwindow *window) {
 
   glfwSetCursorPosCallback(window, [](GLFWwindow *window, double xpos, double ypos) {
     AppState *app = static_cast<AppState *>(glfwGetWindowUserPointer(window));
+    ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
     if (app->is_mouse_captured) {
       if (app->first_mouse) {
         app->lastX = xpos;
@@ -130,6 +132,22 @@ void mainloop(GLFWwindow *window) {
       app->lastY = ypos;
       app->camera->process_mouse_movement(xoffset, yoffset);
     }
+  });
+
+  glfwSetCursorEnterCallback(window, [](GLFWwindow *window, int entered) {
+    ImGui_ImplGlfw_CursorEnterCallback(window, entered);
+  });
+
+  glfwSetScrollCallback(window, [](GLFWwindow *window, double xoffset, double yoffset) {
+    ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+  });
+
+  glfwSetCharCallback(window, [](GLFWwindow *window, unsigned int codepoint) {
+    ImGui_ImplGlfw_CharCallback(window, codepoint);
+  });
+
+  glfwSetWindowFocusCallback(window, [](GLFWwindow *window, int focused) {
+    ImGui_ImplGlfw_WindowFocusCallback(window, focused);
   });
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
