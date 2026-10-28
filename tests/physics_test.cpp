@@ -87,7 +87,7 @@ void test_circular_orbit() {
     simulation.update(dt);
   }
 
-  const double final_distance = glm::length(simulation.body(1).position - simulation.get_bodies()[0].position);
+  const double final_distance = glm::length(simulation.body(1).position - simulation.body(0).position);
   check(std::abs(final_distance - distance) < 1e-3, "circular orbit drifted");
 }
 

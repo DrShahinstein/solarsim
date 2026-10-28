@@ -21,7 +21,6 @@ void initialize_imgui(GLFWwindow *window) {
   io.FontGlobalScale = dpi_scale;
   ImGui::GetStyle().ScaleAllSizes(dpi_scale);
 
-  (void)io;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   ImGui::StyleColorsDark();
   ImGui_ImplGlfw_InitForOpenGL(window, false);
