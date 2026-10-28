@@ -34,21 +34,21 @@ uniform bool lighting_enabled;
 uniform int raymarch_steps;
 
 struct CelestialBody {
-  vec3 position;
+  vec3  position;
   float radius;
-  vec3 color;
+  vec3  color;
   float event_horizon;
-  int is_black_hole;
+  int   is_black_hole;
 };
 
 uniform CelestialBody bodies[MAX_BODIES];
 
-const int MAX_MARCH_STEPS = 256;       // hard bound; the GUI varies steps up to it
-const float FAR_DISTANCE = 200.0;      // well beyond the outermost orbit
-const float SURFACE_EPSILON = 0.001;   // sphere-tracing hit threshold, in AU
-const float MAX_DEFLECTION = 1.5;      // radians; keeps the lensed image stable
-const float DISK_OUTER_FACTOR = 10.0;  // disk radius in units of the horizon
-const float SPECULAR_POWER = 48.0;     // Blinn-Phong specular exponent
+const int   MAX_MARCH_STEPS   = 256;    // hard bound; the GUI varies steps up to it
+const float FAR_DISTANCE      = 200.0;  // well beyond the outermost orbit
+const float SURFACE_EPSILON   = 0.001;  // sphere-tracing hit threshold, in AU
+const float MAX_DEFLECTION    = 1.5;    // radians; keeps the lensed image stable
+const float DISK_OUTER_FACTOR = 10.0;   // disk radius in units of the horizon
+const float SPECULAR_POWER    = 48.0;   // Blinn-Phong specular exponent
 
 // ---------------------------------------------------------------------------
 // Noise
@@ -65,8 +65,8 @@ float hash21(vec2 p) {
 }
 
 float value_noise(vec2 p) {
-  vec2 cell = floor(p);
-  vec2 local = fract(p);
+  vec2 cell         = floor(p);
+  vec2 local        = fract(p);
   vec2 smooth_local = local * local * (3.0 - 2.0 * local);
 
   float a = hash21(cell);
@@ -80,7 +80,7 @@ float value_noise(vec2 p) {
 }
 
 float fbm(vec2 p) {
-  float sum = 0.0;
+  float sum       = 0.0;
   float amplitude = 0.5;
 
   for (int octave = 0; octave < 3; ++octave) {
@@ -112,7 +112,7 @@ float sphere_distance(vec3 point, int index) {
 
 struct NearestSurface {
   float distance;
-  int body;
+  int   body;
 };
 
 // The union of spheres has the exact signed distance min(sphere distances).
@@ -125,7 +125,7 @@ NearestSurface nearest_surface(vec3 point) {
 
     if (distance < nearest.distance) {
       nearest.distance = distance;
-      nearest.body = i;
+      nearest.body     = i;
     }
   }
 
@@ -163,7 +163,7 @@ vec3 starfield(vec2 pixel) {
 
 vec3 rotate_around_axis(vec3 vector, vec3 axis, float angle) {
   float cosine = cos(angle);
-  float sine = sin(angle);
+  float sine   = sin(angle);
 
   return vector * cosine
        + cross(axis, vector) * sine
@@ -178,25 +178,24 @@ vec3 lens_ray(vec3 origin, vec3 direction, out bool captured) {
       continue;
     }
 
-    vec3 to_black_hole = bodies[i].position - origin;
+    vec3  to_black_hole    = bodies[i].position - origin;
     float forward_distance = dot(to_black_hole, direction);
 
     if (forward_distance <= 0.0) {
       continue;
     }
 
-    float impact_squared = dot(to_black_hole, to_black_hole)
-                         - forward_distance * forward_distance;
-    float horizon = bodies[i].event_horizon;
+    float impact_squared = dot(to_black_hole, to_black_hole) - (forward_distance*forward_distance);
+    float horizon        = bodies[i].event_horizon;
 
-    if (impact_squared < horizon * horizon) {
+    if (impact_squared < horizon*horizon) {
       captured = true;
       return direction;
     }
 
-    float impact = sqrt(max(impact_squared, 1e-8));
+    float impact     = sqrt(max(impact_squared, 1e-8));
     float deflection = min(2.0 * horizon / impact, MAX_DEFLECTION);
-    vec3 axis = cross(direction, to_black_hole);
+    vec3  axis       = cross(direction, to_black_hole);
 
     // A zero axis means the ray points at the horizon center, which the
     // capture test above should already have rejected. Guard anyway so a
@@ -220,9 +219,9 @@ vec3 lens_ray(vec3 origin, vec3 direction, out bool captured) {
 // ---------------------------------------------------------------------------
 
 struct SceneHit {
-  bool hit;
+  bool  hit;
   float distance;
-  int body;
+  int   body;
 };
 
 SceneHit trace_scene(vec3 origin, vec3 direction) {
@@ -233,7 +232,7 @@ SceneHit trace_scene(vec3 origin, vec3 direction) {
       break;
     }
 
-    vec3 point = origin + direction * traveled;
+    vec3           point   = origin + direction * traveled;
     NearestSurface surface = nearest_surface(point);
 
     if (surface.distance < SURFACE_EPSILON) {
@@ -259,10 +258,10 @@ SceneHit trace_scene(vec3 origin, vec3 direction) {
 // ---------------------------------------------------------------------------
 
 struct DiskHit {
-  bool hit;
+  bool  hit;
   float distance;
-  vec3 position;
-  int black_hole;
+  vec3  position;
+  int   black_hole;
 };
 
 // The disk plane is fixed in world space, so all black holes share the same
@@ -281,7 +280,7 @@ bool intersect_disk(int index, vec3 origin, vec3 direction,
   hit_distance = -1.0;
   hit_position = vec3(0.0);
 
-  vec3 normal = accretion_disk_normal();
+  vec3  normal      = accretion_disk_normal();
   float denominator = dot(direction, normal);
 
   if (abs(denominator) < 0.001) {
@@ -294,9 +293,9 @@ bool intersect_disk(int index, vec3 origin, vec3 direction,
     return false;
   }
 
-  vec3 intersection = origin + direction * plane_distance;
-  float radius = length(intersection - bodies[index].position);
-  float horizon = bodies[index].event_horizon;
+  vec3  intersection = origin + direction * plane_distance;
+  float radius       = length(intersection - bodies[index].position);
+  float horizon      = bodies[index].event_horizon;
 
   if (radius <= horizon || radius >= horizon * DISK_OUTER_FACTOR) {
     return false;
@@ -316,7 +315,7 @@ DiskHit find_accretion_disk(vec3 origin, vec3 direction) {
     }
 
     float distance;
-    vec3 position;
+    vec3  position;
 
     if (intersect_disk(i, origin, direction, distance, position)
         && distance < nearest.distance) {
@@ -328,27 +327,27 @@ DiskHit find_accretion_disk(vec3 origin, vec3 direction) {
 }
 
 vec3 shade_accretion_disk(DiskHit hit, vec3 ray_origin) {
-  int index = hit.black_hole;
-  vec3 center = bodies[index].position;
-  vec3 offset = hit.position - center;
-  float radius = length(offset);
-  float horizon = bodies[index].event_horizon;
-  float outer_radius = horizon * DISK_OUTER_FACTOR;
+  int   index             = hit.black_hole;
+  vec3  center            = bodies[index].position;
+  vec3  offset            = hit.position - center;
+  float radius            = length(offset);
+  float horizon           = bodies[index].event_horizon;
+  float outer_radius      = horizon * DISK_OUTER_FACTOR;
   float normalized_radius = (radius - horizon) / (outer_radius - horizon);
 
-  vec3 normal = accretion_disk_normal();
-  vec3 tangent = accretion_disk_tangent(normal);
+  vec3 normal    = accretion_disk_normal();
+  vec3 tangent   = accretion_disk_tangent(normal);
   vec3 bitangent = cross(normal, tangent);
 
   // The base pattern uses Cartesian disk coordinates, which stay continuous
   // across atan()'s wrap-around at +/- pi. The spiral offset is built from
   // sin/cos of the phase for the same reason: using the raw angle would leave
   // a visible seam where the angle jumps.
-  vec2 plane = vec2(dot(offset, tangent), dot(offset, bitangent)) / outer_radius;
-  float angle = atan(plane.y, plane.x);
-  float spiral_phase = angle * 2.0 - normalized_radius * 7.0;
-  vec2 spiral_offset = 0.6 * vec2(cos(spiral_phase), sin(spiral_phase));
-  float turbulence = fbm(plane * 8.0 + spiral_offset);
+  vec2  plane         = vec2(dot(offset, tangent), dot(offset, bitangent)) / outer_radius;
+  float angle         = atan(plane.y, plane.x);
+  float spiral_phase  = angle * 2.0 - normalized_radius * 7.0;
+  vec2  spiral_offset = 0.6 * vec2(cos(spiral_phase), sin(spiral_phase));
+  float turbulence    = fbm(plane * 8.0 + spiral_offset);
 
   // The inner disk is hotter and whiter; the outer disk cools toward orange.
   vec3 color = mix(vec3(1.0, 0.95, 0.82),
@@ -358,9 +357,9 @@ vec3 shade_accretion_disk(DiskHit hit, vec3 ray_origin) {
   color *= 0.55 + 0.9 * turbulence;
 
   // Beaming: material orbiting toward the camera appears brighter.
-  vec3 orbital_direction = normalize(cross(normal, offset));
-  vec3 view_direction = normalize(ray_origin - hit.position);
-  float beaming = 1.0 + 0.35 * dot(orbital_direction, view_direction);
+  vec3  orbital_direction = normalize(cross(normal, offset));
+  vec3  view_direction    = normalize(ray_origin - hit.position);
+  float beaming           = 1.0 + 0.35 * dot(orbital_direction, view_direction);
   color *= clamp(beaming, 0.55, 1.45);
 
   // Light climbing out of the gravity well loses energy near the horizon.
@@ -397,13 +396,13 @@ vec3 shade_body(int index, vec3 hit_position, vec3 ray_origin) {
 
   // The hit is on an analytic sphere, so the exact outward normal is simply
   // the normalized offset from the center; no gradient sampling is needed.
-  vec3 normal = normalize(hit_position - bodies[index].position);
-  vec3 light_direction = normalize(bodies[light_index].position - hit_position);
-  vec3 view_direction = normalize(ray_origin - hit_position);
-  vec3 half_vector = light_direction + view_direction;
-  float half_length_sq = dot(half_vector, half_vector);
+  vec3  normal          = normalize(hit_position - bodies[index].position);
+  vec3  light_direction = normalize(bodies[light_index].position - hit_position);
+  vec3  view_direction  = normalize(ray_origin - hit_position);
+  vec3  half_vector     = light_direction + view_direction;
+  float half_length_sq  = dot(half_vector, half_vector);
 
-  float diffuse = max(dot(normal, light_direction), 0.0);
+  float diffuse  = max(dot(normal, light_direction), 0.0);
   float specular = 0.0;
 
   // The half-vector vanishes when the light is exactly behind the surface
@@ -429,12 +428,12 @@ void main() {
 
   // The camera basis is orthonormal, so the offset can be added directly to
   // the forward vector before normalizing.
-  vec3 ray_origin = camera_pos;
+  vec3 ray_origin    = camera_pos;
   vec3 ray_direction = normalize(camera_front
                                + screen_position.x * camera_right
                                + screen_position.y * camera_up);
 
-  bool captured = false;
+  bool captured         = false;
   vec3 lensed_direction = lens_ray(ray_origin, ray_direction, captured);
 
   // A captured ray ends on the horizon, so bending it further has no meaning.
@@ -444,7 +443,7 @@ void main() {
   vec3 traced_direction = captured ? ray_direction : lensed_direction;
 
   SceneHit surface = trace_scene(ray_origin, traced_direction);
-  DiskHit disk = find_accretion_disk(ray_origin, traced_direction);
+  DiskHit  disk    = find_accretion_disk(ray_origin, traced_direction);
 
   vec3 color;
 
@@ -460,3 +459,7 @@ void main() {
 
   FragColor = vec4(color, 1.0);
 }
+
+// ---------------------------------------------------------------------------
+// This shader code was generated using DeepSeek V4.1 Flash.
+// ---------------------------------------------------------------------------
