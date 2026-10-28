@@ -38,10 +38,10 @@ public:
   void setG(double value);
   double getG() const;
   std::vector<CelestialBody> &get_bodies();
+  const std::vector<CelestialBody> &get_bodies() const;
   void update(double dt);
   void reset_to_solar_system();
   void remove_marked_bodies();
-  std::vector<CelestialBody> bodies;
 
 private:
   void compute_forces();
@@ -49,6 +49,7 @@ private:
   void recompute_accelerations();
   void integrate_velocity_verlet(double dt);
   Integrator current_integrator;
+  std::vector<CelestialBody> bodies;
   double G;
 };
 

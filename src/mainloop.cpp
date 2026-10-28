@@ -144,7 +144,7 @@ void mainloop(GLFWwindow *window) {
         app->simulation.reset_to_solar_system();
         break;
       case GLFW_KEY_B: {
-        if (app->simulation.bodies.size() >= MAX_BODIES) break;
+        if (app->simulation.get_bodies().size() >= MAX_BODIES) break;
         CelestialBody new_body{};
         new_body.position = glm::dvec3(app->camera->m_position + app->camera->m_front * 1.0f);
         new_body.velocity = glm::dvec3(0.0);

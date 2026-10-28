@@ -163,7 +163,7 @@ void render_gui(AppState &app) {
     }
   }
 
-  if (ImGui::CollapsingHeader("Add Body") && app.simulation.bodies.size() < MAX_BODIES) {
+  if (ImGui::CollapsingHeader("Add Body") && app.simulation.get_bodies().size() < MAX_BODIES) {
     static CelestialBody new_body{};
     new_body.mass          = app.gui_props.body_editor.mass;
     new_body.radius        = app.gui_props.body_editor.radius;

@@ -14,6 +14,7 @@ void Simulation::clear_bodies()                      { bodies.clear(); }
 void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
 double Simulation::getG()                      const { return G; }
 std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
+const std::vector<CelestialBody> &Simulation::get_bodies() const { return bodies; }
 
 void Simulation::compute_forces() {
   for (auto &body : bodies) {
