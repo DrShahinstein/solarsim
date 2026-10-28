@@ -33,7 +33,7 @@ struct Hit {
 };
 
 Hit ray_march(vec3 ro, vec3 rd);
-vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos);
+vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos, float disk_radius);
 float hash(vec2 p);
 
 float sphere_distance(vec3 p, vec3 center, float radius) {
@@ -119,7 +119,7 @@ void main() {
             float dist_from_center = distance(hit_pos, bodies[i].position);
 
             if (dist_from_center < disk_radius && dist_from_center > event_horizon_radius) {
-              color = accretion_disk_color(hit_pos, bodies[i].position);
+              color = accretion_disk_color(hit_pos, bodies[i].position, disk_radius);
               disk_hit = true;
               break; // stop at the first disk hit
             }
@@ -190,9 +190,9 @@ float hash(vec2 p) {
   return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos) {
+vec3 accretion_disk_color(vec3 hit_pos, vec3 black_hole_pos, float disk_radius) {
   vec3 p = hit_pos - black_hole_pos;
-  float r = length(p) * 0.2;
+  float r = length(p) / disk_radius;
   float angle = atan(p.y, p.x);
 
   float noise = hash(vec2(r * 3.0, angle * 6.0)) * 0.6 +
