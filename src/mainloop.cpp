@@ -104,7 +104,9 @@ void mainloop(GLFWwindow *window) {
   initialize_imgui(window);
   Simulation simulation;
   simulation.reset_to_solar_system();
-  AppState app{.simulation = simulation, .camera = &camera, .simulation_speed = 1.0f};
+  AppState app{};
+  app.simulation = simulation;
+  app.camera = &camera;
   glfwSetWindowUserPointer(window, &app);
 
   // input callbacks
@@ -224,7 +226,7 @@ void mainloop(GLFWwindow *window) {
     // camera
     glfwPollEvents();
     if (app_ptr->input.mouse_captured) {
-      process_input(window, *app_ptr->camera, static_cast<float>(frame_time), &app);
+      process_input(window, *app_ptr->camera, static_cast<float>(frame_time));
     }
 
     // physics update

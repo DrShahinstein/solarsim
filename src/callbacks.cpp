@@ -2,13 +2,12 @@
 #include <GLFW/glfw3.h>
 #include "callbacks.hpp"
 #include "camera.hpp"
-#include "mainloop.hpp"
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow *, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void process_input(GLFWwindow *window, Camera &camera, float delta_time, AppState *app) {
+void process_input(GLFWwindow *window, Camera &camera, float delta_time) {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     camera.process_keyboard(CameraMovement::FORWARD, delta_time);
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
