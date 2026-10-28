@@ -43,30 +43,28 @@ void Simulation::compute_forces() {
 }
 
 void Simulation::apply_post_newtonian_corrections() {
-  std::vector<CelestialBody *> blackholes;
-  for (auto &body : bodies) {
-    if (body.is_black_hole) {
-      blackholes.push_back(&body);
-    }
-  }
+  for (size_t i = 0; i < bodies.size(); ++i) {
+    auto &bh = bodies[i];
+    if (!bh.is_black_hole || bh.mass <= 0.0) continue;
 
-  for (auto *bh : blackholes) {
-    if (bh->mass <= 0.0) continue;
-    const double rs = bh->event_horizon_radius(G);
+    const double rs = bh.event_horizon_radius(G);
 
-    for (auto &other : bodies) {
-      if (&other == bh || other.is_black_hole) continue;
+    for (size_t j = 0; j < bodies.size(); ++j) {
+      if (i == j) continue;
 
-      glm::dvec3 r = other.position - bh->position;
+      auto &other = bodies[j];
+      if (other.is_black_hole || other.mass <= 0.0) continue;
+
+      glm::dvec3 r = other.position - bh.position;
       double distance = glm::length(r);
 
       if (distance < 100.0 * rs) continue;
       if (distance < 1e-10)      continue;
 
-      glm::dvec3 direction = glm::normalize(r);
-      double v_sq = glm::length2(other.velocity);
+      glm::dvec3 direction = r / distance;
+      double v_sq = glm::length2(other.velocity - bh.velocity);
 
-      double correction = (3.0 * G * bh->mass) / ((C * C) * distance);
+      double correction = (3.0 * G * bh.mass) / ((C * C) * distance);
       glm::dvec3 extra_accel = correction * v_sq * direction;
 
       other.acceleration += extra_accel;
