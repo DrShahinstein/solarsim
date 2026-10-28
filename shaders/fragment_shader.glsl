@@ -124,7 +124,8 @@ void main() {
     }
     // 5. IF STILL NO HIT, DRAW STARFIELD
     if (!disk_hit) {
-      float stars = step(0.99995, fract(sin(fragCoord.x * 723.13 + fragCoord.y * 329.41) * 983.17));
+      vec3 star_dir = normalize(ray_dir);
+      float stars = step(0.9995, hash(star_dir.xy * 700.0 + star_dir.z * 31.0));
       color = vec3(stars);
     }
   }
