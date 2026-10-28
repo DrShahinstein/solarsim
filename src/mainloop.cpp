@@ -191,7 +191,12 @@ void mainloop(GLFWwindow *window) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const auto &bodies = app_ptr->simulation.get_bodies();
-    float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
+    int framebuffer_width, framebuffer_height;
+    glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
+    float aspect_ratio = framebuffer_height > 0
+                             ? static_cast<float>(framebuffer_width) / static_cast<float>(framebuffer_height)
+                             : 1.0f;
+    glViewport(0, 0, framebuffer_width, framebuffer_height);
 
     glUseProgram(shader_program);
     glUniform3fv(glGetUniformLocation(shader_program, "camera_pos"), 1, glm::value_ptr(app_ptr->camera->m_position));
