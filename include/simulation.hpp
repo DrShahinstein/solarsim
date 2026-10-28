@@ -1,5 +1,4 @@
-#ifndef SIMULATION_HPP
-#define SIMULATION_HPP
+#pragma once
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -48,5 +47,3 @@ private:
   std::vector<CelestialBody> bodies;
   double G;
 };
-
-#endif

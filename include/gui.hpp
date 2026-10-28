@@ -1,5 +1,4 @@
-#ifndef GUI_H
-#define GUI_H
+#pragma once
 
 #include <GLFW/glfw3.h>
 #include "imgui.h"
@@ -15,5 +14,3 @@ void render_gui(AppState &app);
 void render_body_editor(CelestialBody &body, int index);
 void render_simulation_stats(AppState &app, double frame_time);
 void render_camera_info(Camera &camera);
-
-#endif

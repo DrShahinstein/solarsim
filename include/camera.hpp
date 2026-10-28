@@ -1,5 +1,4 @@
-#ifndef CAMERA_HPP
-#define CAMERA_HPP
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -80,5 +79,3 @@ private:
     m_up = glm::normalize(glm::cross(m_right, m_front));
   }
 };
-
-#endif

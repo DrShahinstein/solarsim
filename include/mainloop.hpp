@@ -1,5 +1,4 @@
-#ifndef MAINLOOP_HPP
-#define MAINLOOP_HPP
+#pragma once
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -39,5 +38,3 @@ struct AppState {
 };
 
 void mainloop(GLFWwindow *window);
-
-#endif

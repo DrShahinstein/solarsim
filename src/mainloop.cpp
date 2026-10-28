@@ -21,7 +21,7 @@ struct Vertex {
   glm::vec3 color;
 };
 
-struct CalestialBodyData {
+struct CelestialBodyData {
   glm::vec3 position;
   glm::vec3 color;
   float radius;
@@ -275,7 +275,7 @@ void mainloop(GLFWwindow *window) {
     glUniform1i(uniforms.light_index, light_index);
 
     for (size_t i = 0; i < bodies.size() && i < MAX_BODIES; i++) {
-      CalestialBodyData body_data = {glm::vec3(bodies[i].position),
+      CelestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
                                      static_cast<float>(bodies[i].mass),
