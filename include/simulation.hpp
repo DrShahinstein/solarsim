@@ -32,11 +32,14 @@ public:
   Simulation();
   void add_body(const CelestialBody &body);
   void clear_bodies();
+  void remove_last_body();
   void setG(double value);
   double getG() const;
   uint64_t get_physics_steps() const;
-  std::vector<CelestialBody> &get_bodies();
+  size_t body_count() const;
   const std::vector<CelestialBody> &get_bodies() const;
+  CelestialBody &body(size_t index);
+  const CelestialBody &body(size_t index) const;
   void update(double dt);
   void reset_to_solar_system();
   void remove_marked_bodies();

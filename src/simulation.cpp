@@ -11,11 +11,18 @@ void Simulation::add_body(const CelestialBody &body) {
   recompute_accelerations();
 }
 void Simulation::clear_bodies()                      { bodies.clear(); }
+void Simulation::remove_last_body() {
+  if (bodies.empty()) return;
+  bodies.pop_back();
+  recompute_accelerations();
+}
 void Simulation::setG(double value)                  { G = value; recompute_accelerations(); }
 double Simulation::getG()                      const { return G; }
 uint64_t Simulation::get_physics_steps()       const { return physics_steps; }
-std::vector<CelestialBody> &Simulation::get_bodies() { return bodies; }
+size_t Simulation::body_count()                const { return bodies.size(); }
 const std::vector<CelestialBody> &Simulation::get_bodies() const { return bodies; }
+CelestialBody &Simulation::body(size_t index)        { return bodies[index]; }
+const CelestialBody &Simulation::body(size_t index)  const { return bodies[index]; }
 
 void Simulation::compute_forces() {
   for (auto &body : bodies) {
@@ -86,10 +93,14 @@ void Simulation::update(double dt) {
 }
 
 void Simulation::remove_marked_bodies() {
+  const size_t previous_count = bodies.size();
   bodies.erase(
       std::remove_if(bodies.begin(), bodies.end(),
                      [](const CelestialBody &body) { return body.marked_for_deletion; }),
       bodies.end());
+  if (bodies.size() != previous_count) {
+    recompute_accelerations();
+  }
 }
 
 void Simulation::integrate_velocity_verlet(double dt) {

@@ -66,7 +66,7 @@ void render_simulation_stats(AppState &app, double frame_time) {
   ImGui::Text("Frame Time: %.3f ms (%.1f FPS)", frame_time * 1000.0, 1.0 / frame_time);
   ImGui::Text("Physics Steps: %llu", static_cast<unsigned long long>(app.simulation.get_physics_steps()));
 
-  size_t body_size = app.simulation.get_bodies().size() * sizeof(CelestialBody);
+  size_t body_size = app.simulation.body_count() * sizeof(CelestialBody);
   ImGui::Text("Memory: %.2f KB", body_size / 1024.0f);
 
   ImGui::Separator();
@@ -155,15 +155,14 @@ void render_gui(AppState &app) {
 
   ImGui::Separator();
   if (ImGui::CollapsingHeader("Celestial Bodies", ImGuiTreeNodeFlags_DefaultOpen)) {
-    auto &bodies = app.simulation.get_bodies();
-    for (size_t i = 0; i < bodies.size(); i++) {
+    for (size_t i = 0; i < app.simulation.body_count(); i++) {
       ImGui::PushID(i);
-      render_body_editor(bodies[i], static_cast<int>(i));
+      render_body_editor(app.simulation.body(i), static_cast<int>(i));
       ImGui::PopID();
     }
   }
 
-  if (ImGui::CollapsingHeader("Add Body") && app.simulation.get_bodies().size() < MAX_BODIES) {
+  if (ImGui::CollapsingHeader("Add Body") && app.simulation.body_count() < MAX_BODIES) {
     static CelestialBody new_body{};
     new_body.mass          = app.gui.body_editor.mass;
     new_body.radius        = app.gui.body_editor.radius;

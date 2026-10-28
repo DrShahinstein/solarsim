@@ -77,7 +77,7 @@ void test_circular_orbit() {
   planet.radius = 0.01;
   planet.velocity = glm::dvec3(0.0, relative_speed * sun_mass / (sun_mass + planet_mass), 0.0);
   simulation.add_body(planet);
-  simulation.get_bodies()[0].velocity = glm::dvec3(0.0, -relative_speed * planet_mass / (sun_mass + planet_mass), 0.0);
+  simulation.body(0).velocity = glm::dvec3(0.0, -relative_speed * planet_mass / (sun_mass + planet_mass), 0.0);
 
   const double period = 2.0 * 3.141592653589793 * std::sqrt(distance * distance * distance / (DEFAULT_G * (sun_mass + planet_mass)));
   const double dt = 0.01;
@@ -87,7 +87,7 @@ void test_circular_orbit() {
     simulation.update(dt);
   }
 
-  const double final_distance = glm::length(simulation.get_bodies()[1].position - simulation.get_bodies()[0].position);
+  const double final_distance = glm::length(simulation.body(1).position - simulation.get_bodies()[0].position);
   check(std::abs(final_distance - distance) < 1e-3, "circular orbit drifted");
 }
 
@@ -95,17 +95,17 @@ void test_body_lifecycle() {
   Simulation simulation;
   simulation.reset_to_solar_system();
 
-  const size_t initial_count = simulation.get_bodies().size();
+  const size_t initial_count = simulation.body_count();
 
   CelestialBody body{};
   body.mass = 1e-6;
   body.position = glm::dvec3(2.0, 0.0, 0.0);
   simulation.add_body(body);
-  check(simulation.get_bodies().size() == initial_count + 1, "body was not added");
+  check(simulation.body_count() == initial_count + 1, "body was not added");
 
-  simulation.get_bodies().back().marked_for_deletion = true;
+  simulation.body(simulation.body_count() - 1).marked_for_deletion = true;
   simulation.remove_marked_bodies();
-  check(simulation.get_bodies().size() == initial_count, "body was not removed");
+  check(simulation.body_count() == initial_count, "body was not removed");
 }
 
 void test_body_limit() {
@@ -119,7 +119,7 @@ void test_body_limit() {
     simulation.add_body(body);
   }
 
-  check(simulation.get_bodies().size() == MAX_BODIES, "body limit is not enforced");
+  check(simulation.body_count() == MAX_BODIES, "body limit is not enforced");
 }
 
 }
