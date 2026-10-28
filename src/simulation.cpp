@@ -68,6 +68,7 @@ void Simulation::apply_post_newtonian_corrections() {
       glm::dvec3 extra_accel = correction * v_sq * direction;
 
       other.acceleration += extra_accel;
+      bh.acceleration -= (other.mass / bh.mass) * extra_accel;
     }
   }
 }
