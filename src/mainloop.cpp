@@ -81,6 +81,10 @@ ShaderUniforms get_uniform_locations(unsigned int shader_program) {
 void mainloop(GLFWwindow *window) {
   // shaders
   auto shader_program = create_shader_program();
+  if (shader_program == 0) {
+    std::cerr << "Failed to create shader program\n";
+    return;
+  }
   ShaderUniforms uniforms = get_uniform_locations(shader_program);
 
   // fs quad setup
