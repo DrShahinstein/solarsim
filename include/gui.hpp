@@ -8,8 +8,7 @@
 #include "simulation.hpp"
 #include "mainloop.hpp"
 
-#define UI_WIDTH         350.0f
-#define MIN_SLIDER_WIDTH 150.0f
+constexpr float UI_WIDTH = 350.0f;
 
 void initialize_imgui(GLFWwindow *window);
 void render_gui(AppState &app);

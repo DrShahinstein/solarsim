@@ -7,8 +7,8 @@
 #include "shaders.hpp"
 #include "simulation.hpp"
 
-#define VERTEX_SHADER   "shaders/vertex_shader.glsl"
-#define FRAGMENT_SHADER "shaders/fragment_shader.glsl"
+constexpr const char *VERTEX_SHADER = "shaders/vertex_shader.glsl";
+constexpr const char *FRAGMENT_SHADER = "shaders/fragment_shader.glsl";
 
 std::string load_shader(const char *shader_path) {
   std::ifstream shader_file(shader_path);

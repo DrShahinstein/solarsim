@@ -4,8 +4,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#define C 173.1446
-#define DEFAULT_G 0.000295912208
+constexpr double C = 173.1446;
+constexpr double DEFAULT_G = 0.000295912208;
 
 constexpr int MAX_BODIES = 20;
 constexpr double BLACK_HOLE_VISUAL_SCALE = 2.5e7;
