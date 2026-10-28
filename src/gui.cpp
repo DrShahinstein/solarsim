@@ -52,7 +52,7 @@ void render_body_editor(CelestialBody &body, int index) {
     ImGui::Checkbox("Star", &body.is_star);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-    if (ImGui::Button(("Delete##" + std::to_string(index)).c_str())) body.mass = 0;
+    if (ImGui::Button(("Delete##" + std::to_string(index)).c_str())) body.marked_for_deletion = true;
     ImGui::PopStyleColor(2);
     ImGui::PopItemWidth();
   }

@@ -25,6 +25,8 @@ void Simulation::compute_forces() {
       auto &body1 = bodies[i];
       auto &body2 = bodies[j];
 
+      if (body1.mass <= 0.0 || body2.mass <= 0.0) continue;
+
       glm::dvec3 r = body2.position - body1.position;
       double distance_sq = glm::length2(r);
 
@@ -51,6 +53,7 @@ void Simulation::apply_post_newtonian_corrections() {
   }
 
   for (auto *bh : blackholes) {
+    if (bh->mass <= 0.0) continue;
     const double rs = (2.0 * G * bh->mass) / C_SQ;
 
     for (auto &other : bodies) {
@@ -85,7 +88,7 @@ void Simulation::update(double dt) {
 void Simulation::remove_marked_bodies() {
   bodies.erase(
       std::remove_if(bodies.begin(), bodies.end(),
-                     [](const CelestialBody &body) { return body.mass <= 0; }),
+                     [](const CelestialBody &body) { return body.marked_for_deletion; }),
       bodies.end());
 }
 

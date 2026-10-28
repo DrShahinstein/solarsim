@@ -18,6 +18,7 @@ struct CelestialBody {
   glm::vec3 color{0.0};
   bool is_black_hole = false;
   bool is_star = false;
+  bool marked_for_deletion = false;
   glm::dvec3 previous_acceleration{0.0};
 };
 

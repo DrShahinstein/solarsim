@@ -194,7 +194,7 @@ void mainloop(GLFWwindow *window) {
     while (accumulator >= dt && steps < MAX_STEPS_PER_FRAME) {
       if (!app_ptr->is_paused) {
         app_ptr->simulation.update(dt);
-        app_ptr->simulation.remove_marked_bodies(); // erase mass=0 bodies 
+        app_ptr->simulation.remove_marked_bodies();
       }
       accumulator -= dt;
       ++steps;
