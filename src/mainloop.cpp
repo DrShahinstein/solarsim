@@ -151,7 +151,6 @@ void mainloop(GLFWwindow *window) {
         new_body.radius = app->gui.body_editor.radius;
         new_body.color = app->gui.body_editor.color;
         new_body.is_black_hole = app->gui.body_editor.is_black_hole;
-        new_body.is_star = app->gui.body_editor.is_star;
         app->simulation.add_body(new_body);
         break;
       }
@@ -282,7 +281,7 @@ void mainloop(GLFWwindow *window) {
       CelestialBodyData body_data = {glm::vec3(bodies[i].position),
                                      bodies[i].color,
                                      static_cast<float>(bodies[i].radius),
-                                     static_cast<float>(bodies[i].event_horizon_radius(app_ptr->simulation.getG()) * BLACK_HOLE_VISUAL_SCALE),
+                                     static_cast<float>(bodies[i].is_black_hole ? bodies[i].radius * 0.5 : 0.0),
                                      bodies[i].is_black_hole ? 1 : 0};
 
       glUniform3fv(uniforms.bodies[i].position, 1, glm::value_ptr(body_data.position));

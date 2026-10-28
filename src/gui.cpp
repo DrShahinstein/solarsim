@@ -38,19 +38,16 @@ void render_body_editor(CelestialBody &body, int index) {
       body.mass = static_cast<double>(mass);
     }
 
-    ImGui::BeginDisabled(body.is_black_hole);
     float radius = static_cast<float>(body.radius);
     if (ImGui::SliderFloat("Radius", &radius, 0.01f, 2.0f)) {
       body.radius = static_cast<double>(radius);
     }
-    ImGui::EndDisabled();
 
     ImGui::InputScalarN("Position", ImGuiDataType_Double, &body.position.x, 3, nullptr, nullptr, "%.6f");
     ImGui::InputScalarN("Velocity", ImGuiDataType_Double, &body.velocity.x, 3, nullptr, nullptr, "%.6f");
 
     ImGui::ColorEdit3("Color", &body.color[0]);
     ImGui::Checkbox("Black Hole", &body.is_black_hole);
-    ImGui::Checkbox("Star", &body.is_star);
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
     if (ImGui::Button(("Delete##" + std::to_string(index)).c_str())) body.marked_for_deletion = true;
@@ -167,27 +164,21 @@ void render_gui(AppState &app) {
     new_body.radius        = app.gui.body_editor.radius;
     new_body.color         = app.gui.body_editor.color;
     new_body.is_black_hole = app.gui.body_editor.is_black_hole;
-    new_body.is_star       = app.gui.body_editor.is_star;
     new_body.position      = app.camera->m_position + app.camera->m_front * 1.0f;
     new_body.velocity      = glm::dvec3(0.0, 0.0, 0.0);
 
     if (ImGui::SliderFloat("Mass", &app.gui.body_editor.mass, 1e-8f, 100.0f, "%.8f", ImGuiSliderFlags_Logarithmic)) {
       new_body.mass = app.gui.body_editor.mass;
     }
-    ImGui::BeginDisabled(app.gui.body_editor.is_black_hole);
     if (ImGui::SliderFloat("Radius", &app.gui.body_editor.radius, 0.01f, 2.0f)) {
       new_body.radius = app.gui.body_editor.radius;
     }
-    ImGui::EndDisabled();
     if (ImGui::ColorEdit3("Color", &app.gui.body_editor.color[0])) {
       new_body.color = app.gui.body_editor.color;
     }
 
     ImGui::Checkbox("Black Hole", &app.gui.body_editor.is_black_hole);
     new_body.is_black_hole = app.gui.body_editor.is_black_hole;
-
-    ImGui::Checkbox("Star", &app.gui.body_editor.is_star);
-    new_body.is_star = app.gui.body_editor.is_star;
 
     if (ImGui::Button("Add")) {
       app.simulation.add_body(new_body);
