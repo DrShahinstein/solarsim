@@ -2,46 +2,47 @@
 
 3D solar system simulator using OpenGL for graphics.
 
-## Dependencies Installation
+## Dependencies
 
-Get [meson](https://mesonbuild.com/Getting-meson.html) first.
+Get [meson](https://mesonbuild.com/Getting-meson.html) first.  
 
 ### Linux
 
 #### => pacman
 
 ```bash
-$ sudo pacman -S glfw glm glew mesa libx11 libxi libxrandr \
-                 libxinerama libxcursor pkgconf base-devel
+$ sudo pacman -S mesa libx11 libxi libxrandr libxinerama libxcursor \
+                 pkgconf base-devel
 ```
 
 #### => apt
 
 ```bash
-$ sudo apt install libglfw3-dev libgl1-mesa-dev \
+$ sudo apt install libgl1-mesa-dev libgl-dev \
                    libx11-dev libxi-dev libxrandr-dev libxinerama-dev \
-                   libxcursor-dev build-essential pkg-config libglm-dev \
-                   libgl-dev libglu1-mesa-dev
+                   libxcursor-dev build-essential pkg-config
 ```
 
 #### => dnf
 
 ```bash
-$ sudo dnf install glfw-devel mesa-libGL-devel \
+$ sudo dnf install mesa-libGL-devel \
                    libX11-devel libXi-devel libXrandr-devel \
-                   libXinerama-devel libXcursor-devel
+                   libXinerama-devel libXcursor-devel \
+                   gcc-c++ pkgconf-pkg-config ninja-build
 ```
 
 ### Macos
 
+Install the Xcode command line tools, then:
+
 ```bash
-$ brew install gcc pkg-config glfw glm
+$ brew install meson ninja pkg-config
 ```
 
 ### Windows
 
-Just make sure you have meson installed and you are building from [w64devkit terminal](https://github.com/DrShahinstein/solarsim/tree/main/glfw/lib-mingw).
-That is also what I did in my case for Windows which was easy enough. Have no knowledge about msys2 stuff.
+Just make sure you have meson installed and you are building from [w64devkit](https://github.com/skeeto/w64devkit) terminal. That is also what I did in my case for Windows which was easy enough. Have no knowledge about msys2 stuff.  
 
 ## Build
 

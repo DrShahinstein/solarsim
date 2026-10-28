@@ -3,3 +3,9 @@ build
 .cache
 compile_flags.txt
 imgui.ini
+
+subprojects/packagecache/
+subprojects/glfw-*/
+subprojects/glm-*/
+subprojects/imgui-*/
+
