@@ -4,7 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include "simulation.hpp"
 
-Simulation::Simulation() : G(DEFAULT_G)              { current_integrator = &Simulation::integrate_velocity_verlet; }
+Simulation::Simulation() : G(DEFAULT_G) {}
 void Simulation::add_body(const CelestialBody &body) {
   if (bodies.size() >= MAX_BODIES) return;
   bodies.push_back(body);
@@ -80,7 +80,7 @@ void Simulation::recompute_accelerations() {
 }
 
 void Simulation::update(double dt) {
-  (this->*current_integrator)(dt);
+  integrate_velocity_verlet(dt);
 }
 
 void Simulation::remove_marked_bodies() {

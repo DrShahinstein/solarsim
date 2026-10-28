@@ -27,9 +27,6 @@ struct CelestialBody {
   }
 };
 
-class Simulation;
-using Integrator = void (Simulation::*)(double);
-
 class Simulation {
 public:
   Simulation();
@@ -48,7 +45,6 @@ private:
   void apply_post_newtonian_corrections();
   void recompute_accelerations();
   void integrate_velocity_verlet(double dt);
-  Integrator current_integrator;
   std::vector<CelestialBody> bodies;
   double G;
 };
