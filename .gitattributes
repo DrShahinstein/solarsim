@@ -1,0 +1,8 @@
+# so they run in w64devkit
+*.sh         text eol=lf
+*.glsl       text eol=lf
+*.wrap       text eol=lf
+meson.build  text eol=lf
+*.yml        text eol=lf
+*.yaml       text eol=lf
+
