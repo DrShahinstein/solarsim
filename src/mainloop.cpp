@@ -69,10 +69,6 @@ void mainloop(GLFWwindow *window) {
 
     ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
-    if (io.WantCaptureKeyboard) {
-      return;
-    }
-
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
       if (app->is_mouse_captured) {
         glfwGetCursorPos(window, &app->lastX, &app->lastY);
@@ -86,6 +82,11 @@ void mainloop(GLFWwindow *window) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         app->first_mouse = true;
       }
+      return;
+    }
+
+    if (io.WantCaptureKeyboard) {
+      return;
     }
 
     if (action == GLFW_PRESS && app->is_mouse_captured) {
